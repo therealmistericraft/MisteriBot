@@ -8,7 +8,7 @@ from time import sleep
 from discord.utils import get
 import json
 
-#Dreistellige Fehlernummern: Fehler, die die Öffentlichkeit sehen können; Vierstellige Fehlernummern: interne Fehler
+#three-digit-error-numbers: public error numbers, which can be seen by everyone; four-digit-error-numbers: internal errors, can only be seen by script host
 
 #TODO: *hier einfügen*
 
