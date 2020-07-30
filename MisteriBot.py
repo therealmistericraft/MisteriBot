@@ -10,7 +10,7 @@ import json
 
 #three-digit-error-numbers: public error numbers, which can be seen by everyone; four-digit-error-numbers: internal errors, can only be seen by script host
 
-#TODO: *hier einfügen*
+#TODO: *add here*
 
 #clipboard
 #1️⃣
@@ -27,6 +27,7 @@ import json
 #⬅️
 #➡️
 #🎲
+
 file = open('prefix.txt', 'r')
 data = file.read()
 data = data.split('\n')
