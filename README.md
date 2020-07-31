@@ -1,4 +1,4 @@
-# MisteriBot
-The MisteriBot is a Discord Bot, actually designed only to work on my Server, but I want to change this.
+# MisteriBot support server bot
+There are some things a bot should do on my support server but are only for it.
 
 My native language is german and I think I wrote german too, I hope I can fix it so you can understand it too.
