@@ -45,7 +45,7 @@ async def determine_prefix(bot, message):
 client = commands.Bot(command_prefix = determine_prefix)
 client.remove_command('help')
 
-prefix = xy
+prefix = 'xy'
 
 helpembed1 = discord.Embed(title='Hilfe - Seite 1', description='**Tools**\n*Wörter in* ``[eckigen Klammern]`` *müssen* ***ersetzt*** *werden*\n*Wörter in* ``(Klammern)`` *sind* ***optional***\n*Durch* ``/`` *getrennte Wörter sind* ***alternativ***\n-', colour=discord.Colour.from_rgb(r=255, g=127, b=0))
 helpembed1 = helpembed1.add_field(name='**'+prefix+'clear [(Anzahl)]**', value='Dieser Command **löscht** die nachfolgend angegebene Anzahl an **Nachrichten** (standardgemäß eine). **Angepinnte Nachrichten** werden **ausgelassen**.\n\n*Dieser Command kann nur von Leuten ausgeführt werden, die Nachrichten verwalten dürfen.*', inline=True)
@@ -132,6 +132,9 @@ async def on_member_join(member):
 
 @client.event
 async def on_raw_reaction_add(payload):
+    global custom_prefixes
+    global prefix
+    prefix = custom_prefixes[payload.guild_id]
     if not payload.user_id == 707242307610476595 and not payload.user_id == 708584393555312690:
         print('Es wurde mit "'+payload.emoji.name+'" reagiert.')
         if payload.emoji.name == '➡️':
@@ -148,9 +151,6 @@ async def on_raw_reaction_add(payload):
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
-				global prefix
-				global custom_prefixes
-				prefix = custom_prefixes[payload.guild_id]
                 if helppages[index] == 2:
                     global helpembed2
                     await message.edit(content=None, embed=helpembed2)
@@ -165,9 +165,7 @@ async def on_raw_reaction_add(payload):
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
-				global prefix
-				global custom_prefixes
-				prefix = custom_prefixes[payload.guild_id]
+                prefix = custom_prefixes[payload.guild_id]
                 if clpages[index] == 1:
                     await message.edit(content=None, embed=clembed1)
                 if clpages[index] == 2:
@@ -194,9 +192,7 @@ async def on_raw_reaction_add(payload):
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
-				global prefix
-				global custom_prefixes
-				prefix = custom_prefixes[payload.guild_id]
+                prefix = custom_prefixes[payload.guild_id]
                 if helppages[index] == 1:
                     global helpembed1
                     await message.edit(content=None, embed=helpembed1)
@@ -213,9 +209,7 @@ async def on_raw_reaction_add(payload):
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
-				global prefix
-				global custom_prefixes
-				prefix = custom_prefixes[payload.guild_id]
+                prefix = custom_prefixes[payload.guild_id]
                 if clpages[index] == 0:
                     global clembed0
                     await message.edit(content=None, embed=clembed0)
@@ -252,8 +246,8 @@ async def on_raw_reaction_add(payload):
 @client.event
 async def on_message(message):
     global prefix
-	global custom_prefixes
-	prefix = custom_prefixes[message.guild.id]
+    global custom_prefixes
+    prefix = custom_prefixes[message.guild.id]
     if isinstance(message.channel, discord.DMChannel) and not message.author.id == 708584393555312690 and not message.author.id == 707242307610476595 and not message.content.startswith(prefix):
         global weiterleitung_id
         global weiterleitung_author_id
@@ -272,9 +266,9 @@ async def on_message(message):
 @commands.guild_only()
 @commands.has_permissions(manage_webhooks=True)
 async def changeprefix(ctx, arg):
-	global custom_prefixes
-	global default_prefix
-	custom_prefixes[ctx.guild.id] = arg or default_prefix
+    global custom_prefixes
+    global default_prefix
+    custom_prefixes[ctx.guild.id] = arg or default_prefix
     file = open('prefix.txt', 'w')
     file.write()
     file.close()
@@ -291,9 +285,9 @@ async def howto(ctx, *, arg):
 
 @client.command()
 async def help(ctx):
-	global prefix
-	global custom_prefixes
-	prefix = custom_prefixes[ctx.guild.id]
+    global prefix
+    global custom_prefixes
+    prefix = custom_prefixes[ctx.guild.id]
     await ctx.channel.purge(limit=1)
     global helpembed1
     global helpids
@@ -312,9 +306,9 @@ async def help(ctx):
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def globalhelp(ctx):
-	global prefix
-	global custom_prefixes
-	prefix = custom_prefixes[ctx.guild.id]
+    global prefix
+    global custom_prefixes
+    prefix = custom_prefixes[ctx.guild.id]
     await ctx.channel.purge(limit=1)
     global helpembed1
     global helpembed2
@@ -323,9 +317,9 @@ async def globalhelp(ctx):
 
 @client.command(aliases=['cl'])
 async def changelog(ctx):
-	global prefix
-	global custom_prefixes
-	prefix = custom_prefixes[ctx.guild.id]
+    global prefix
+    global custom_prefixes
+    prefix = custom_prefixes[ctx.guild.id]
     await ctx.channel.purge(limit=1)
     global clembed4
     global clids
@@ -344,9 +338,9 @@ async def changelog(ctx):
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def globalchangelog(ctx):
-	global prefix
-	global custom_prefixes
-	prefix = custom_prefixes[ctx.guild.id]
+    global prefix
+    global custom_prefixes
+    prefix = custom_prefixes[ctx.guild.id]
     await ctx.channelk.purge(limit=1)
     global clembed4
     await ctx.send(content=None, embed=clembed4)
@@ -408,9 +402,9 @@ async def pc_delete(ctx, name):
 
 @client.command(aliases=['personal_channel', 'private_chat', 'privatchat'])
 async def pc(ctx, name):
-	global prefix
-	global custom_prefixes
-	prefix = custom_prefixes[ctx.guild.id]
+    global prefix
+    global custom_prefixes
+    prefix = custom_prefixes[ctx.guild.id]
     if isinstance(ctx.message.channel, discord.DMChannel):
         await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
     else:
