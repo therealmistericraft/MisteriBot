@@ -7,6 +7,7 @@ import random
 from time import sleep
 from discord.utils import get
 import json
+import ast
 
 #three-digit-error-numbers: public error numbers, which can be seen by everyone; four-digit-error-numbers: internal errors, can only be seen by script host
 
@@ -32,20 +33,21 @@ file = open('prefix.txt', 'r')
 data = file.read()
 data = data.split('\n')
 custom_prefixes = data[0]
-default_prefix = '*'
+custom_prefixes = ast.literal_eval(custom_prefixes)
+default_prefix = '%'
 file.close()
 
 async def determine_prefix(bot, message):
 	guild = message.guild
 	if guild:
-		return custom_prefixes.get(guild.id, default_prefix)
+		return custom_prefixes.get(guild.id)
 	else:
 		return default_prefix
 
 client = commands.Bot(command_prefix = determine_prefix)
 client.remove_command('help')
 
-prefix = 'xy'
+prefix = ''
 
 helpembed1 = discord.Embed(title='Hilfe - Seite 1', description='**Tools**\n*Wörter in* ``[eckigen Klammern]`` *müssen* ***ersetzt*** *werden*\n*Wörter in* ``(Klammern)`` *sind* ***optional***\n*Durch* ``/`` *getrennte Wörter sind* ***alternativ***\n-', colour=discord.Colour.from_rgb(r=255, g=127, b=0))
 helpembed1 = helpembed1.add_field(name='**'+prefix+'clear [(Anzahl)]**', value='Dieser Command **löscht** die nachfolgend angegebene Anzahl an **Nachrichten** (standardgemäß eine). **Angepinnte Nachrichten** werden **ausgelassen**.\n\n*Dieser Command kann nur von Leuten ausgeführt werden, die Nachrichten verwalten dürfen.*', inline=True)
@@ -53,7 +55,7 @@ helpembed1 = helpembed1.add_field(name='**'+prefix+'clear pinned [(Anzahl)]**', 
 helpembed1 = helpembed1.add_field(name='**'+prefix+'getID (channel/[#CHANNEL]/[@MENTION])**', value='Gibt *deine eigene* (Wenn nachfolgend leer) ID / die ID des *Channels* / die ID des *ausgewählten Channels* / die ID der *ausgewählten Person* aus.\n``Alias: '+prefix+'id``', inline=False)
 helpembed1 = helpembed1.add_field(name='**'+prefix+'ping**', value='Gibt die Latenz zum Bot im ``ms`` an.\n***Achtung:*** *Die Latenz kann auch durch die Internetleitung des Hosts beeinflusst werden.*', inline=False)
 helpembed1 = helpembed1.add_field(name='**'+prefix+'embed [Nachricht]**', value='Stellt deine Nachricht als Embed dar.', inline=False)
-helpembed1 = helpembed1.add_field(name='**'+prefix+'changeprefix [Prefix]**', value='Ändert das Prefix des Bots. \n\nDieser Command kann nur von Leuten ausgeführt werden, die Webhooks verwalten dürfen.')
+helpembed1 = helpembed1.add_field(name='**'+prefix+'changeprefix [prefix]**', value='Ändert das prefix des Bots. \n\nDieser Command kann nur von Leuten ausgeführt werden, die Webhooks verwalten dürfen.')
 
 helpembed2 = discord.Embed(title='Hilfe - Seite 2', description='**Misc (Miscellanineous)**\n*Wörter in* ``[eckigen Klammern]`` *müssen* ***ersetzt*** *werden*\n*Wörter in* ``(Klammern)`` *sind* ***optional***\n*Durch* ``/`` *getrennte Wörter sind* ***alternativ***\n-', colour=discord.Colour.from_rgb(r=255, g=127, b=0))
 helpembed2 = helpembed2.add_field(name='**'+prefix+'wuerfeln [(max. Augenzahl)]**', value='Würfelt eine Zahl von 0 bis zur angegebenen Maximalzahl (wenn leer: 6)')
@@ -79,7 +81,7 @@ clembed3 = clembed3.add_field(name='Sonstiges', value='-Nach ausführen des ``'+
 clembed4 = discord.Embed(title='Changelog V5.0', colour=discord.Colour.from_rgb(r=255, g=229, b=196))
 clembed4 = clembed4.add_field(name='Sonstiges:', value='-Würfel-Emoji bei ``'+prefix+'wuerfeln`` zu Standard-Discord-Emoji gemacht\n-Bei ``'+prefix+'wiederruf`` wurde bisher die zuletzt gesendete Nachricht gelöscht, egal, wer diese gesendet hat. Jetzt wird das letzte Feedback des jeweiligen Authors gelöscht, durch erneute Eingabe des Commands kann weiteres Feedback gelöscht werden.\n-Rächtschraipfela koregirt\n-Leute mit der Berechtigung, Nachrichten zu verwalten, können bei bestimmten Commands das Output deaktivieren.\n-Bei ``'+prefix+'entscheidung`` kann nun zwischen unendlich vielen Sachen entschieden werden.')
 clembed4 = clembed4.add_field(name='Generelles:', value='Am Namen der Version erkennt ihr, dass es ein großes Update ist. Viel davon merken werdet ihr aber nicht, da es eine Interne Umstellung ist. Viele Variablen werden nun in einer seperaten Textdatei gespeichert, was den Vorteil hat, dass z.B. bei dem ``'+prefix+'changelog`` -Command auch noch durchgeschaltet werden kann, wenn der Bot in der Zwischenzeit neu gestartet wurde.')
-clembed4 = clembed4.add_field(name='Neue Funktionen', value='Der ``'+prefix+'howto``-Command gibt von mir vorgefertigte Hilfestellugnen aus, die ich so nicht im Internet finden konnte. Aktuell ist nur ``'+prefix+'howto python save var to file`` verfügbar.\n-Menschen mit kleinen Hammern aus dem Thor-DLC können nun das Prefix des Bots ändern')
+clembed4 = clembed4.add_field(name='Neue Funktionen', value='Der ``'+prefix+'howto``-Command gibt von mir vorgefertigte Hilfestellugnen aus, die ich so nicht im Internet finden konnte. Aktuell ist nur ``'+prefix+'howto python save var to file`` verfügbar.\n-Menschen mit kleinen Hammern aus dem Thor-DLC können nun das prefix des Bots ändern')
 clembed5 = discord.Embed(title='Es ist kein neuerer Changelog verfügbar.', colour=discord.Colour.red())
 
 
@@ -119,7 +121,7 @@ def refresh():
 @client.event
 async def on_ready():
     print('Ready.')
-    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=len(bot.guilds)+'Guilds with different prefixes'))
+    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=str(len(client.guilds))+ ' Guilds with different prefixes'))
 
 @client.event
 async def on_member_join(member):
@@ -132,9 +134,6 @@ async def on_member_join(member):
 
 @client.event
 async def on_raw_reaction_add(payload):
-    global custom_prefixes
-    global prefix
-    prefix = custom_prefixes[payload.guild_id]
     if not payload.user_id == 707242307610476595 and not payload.user_id == 708584393555312690:
         print('Es wurde mit "'+payload.emoji.name+'" reagiert.')
         if payload.emoji.name == '➡️':
@@ -165,7 +164,6 @@ async def on_raw_reaction_add(payload):
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
-                prefix = custom_prefixes[payload.guild_id]
                 if clpages[index] == 1:
                     await message.edit(content=None, embed=clembed1)
                 if clpages[index] == 2:
@@ -192,7 +190,6 @@ async def on_raw_reaction_add(payload):
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
-                prefix = custom_prefixes[payload.guild_id]
                 if helppages[index] == 1:
                     global helpembed1
                     await message.edit(content=None, embed=helpembed1)
@@ -209,7 +206,6 @@ async def on_raw_reaction_add(payload):
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
-                prefix = custom_prefixes[payload.guild_id]
                 if clpages[index] == 0:
                     global clembed0
                     await message.edit(content=None, embed=clembed0)
@@ -246,8 +242,8 @@ async def on_raw_reaction_add(payload):
 @client.event
 async def on_message(message):
     global prefix
-    global custom_prefixes
-    prefix = custom_prefixes[message.guild.id]
+    global client
+    prefix = determine_prefix(message = message, bot = client)
     if isinstance(message.channel, discord.DMChannel) and not message.author.id == 708584393555312690 and not message.author.id == 707242307610476595 and not message.content.startswith(prefix):
         global weiterleitung_id
         global weiterleitung_author_id
@@ -268,11 +264,11 @@ async def on_message(message):
 async def changeprefix(ctx, arg):
     global custom_prefixes
     global default_prefix
-    custom_prefixes[ctx.guild.id] = arg or default_prefix
+    custom_prefixes[ctx.guild.id] = arg
     file = open('prefix.txt', 'w')
-    file.write()
+    file.write(custom_prefixes)
     file.close()
-    await ctx.send(content=None, embed=discord.Embed(title='Das Prefix wurde erfolgreich zu ``'+custom_prefixes[ctx.guild.id] or default_prefix+'`` geändert.', colour=discord.Colour.orange()))
+    await ctx.send(content=None, embed=discord.Embed(title='Das prefix wurde erfolgreich zu ``'+custom_prefixes.get(ctx.guild.id)+'`` geändert.', colour=discord.Colour.orange()))
 
 @client.command()
 async def howto(ctx, *, arg):
@@ -285,9 +281,6 @@ async def howto(ctx, *, arg):
 
 @client.command()
 async def help(ctx):
-    global prefix
-    global custom_prefixes
-    prefix = custom_prefixes[ctx.guild.id]
     await ctx.channel.purge(limit=1)
     global helpembed1
     global helpids
@@ -306,9 +299,6 @@ async def help(ctx):
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def globalhelp(ctx):
-    global prefix
-    global custom_prefixes
-    prefix = custom_prefixes[ctx.guild.id]
     await ctx.channel.purge(limit=1)
     global helpembed1
     global helpembed2
@@ -317,9 +307,6 @@ async def globalhelp(ctx):
 
 @client.command(aliases=['cl'])
 async def changelog(ctx):
-    global prefix
-    global custom_prefixes
-    prefix = custom_prefixes[ctx.guild.id]
     await ctx.channel.purge(limit=1)
     global clembed4
     global clids
@@ -338,9 +325,6 @@ async def changelog(ctx):
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def globalchangelog(ctx):
-    global prefix
-    global custom_prefixes
-    prefix = custom_prefixes[ctx.guild.id]
     await ctx.channelk.purge(limit=1)
     global clembed4
     await ctx.send(content=None, embed=clembed4)
@@ -402,9 +386,6 @@ async def pc_delete(ctx, name):
 
 @client.command(aliases=['personal_channel', 'private_chat', 'privatchat'])
 async def pc(ctx, name):
-    global prefix
-    global custom_prefixes
-    prefix = custom_prefixes[ctx.guild.id]
     if isinstance(ctx.message.channel, discord.DMChannel):
         await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
     else:
@@ -590,4 +571,4 @@ async def google(ctx, *, msg):
     await ctx.send(content=None, embed=embed)
 
 
-client.run('NzA4NTg0MzkzNTU1MzEyNjkw.XrZepA.gMqGh9SpZxlBBQJItONhSzuli2A')
+client.run('#TODO: insert token')
