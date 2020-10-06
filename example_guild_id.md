@@ -4,6 +4,8 @@
 
 > Changelog is not saved here, it will be only avaiable in english!
 
+> This file should normally only be read, write only from the commands ``set_language``, ``set_welcome_message`` and ``warn`` (they do not have to be named like this, because they do not exist right now)
+
 ---
 
 ### Line 1:
