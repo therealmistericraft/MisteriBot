@@ -1,5 +1,7 @@
 > Files named after the guild id save every custom thing, except the prefix for now (should be added later, but never change a running system).
 
+> Final file should be a ``.txt``-File!
+
 > Changelog is not saved here, it will be only avaiable in english!
 
 ---
@@ -15,3 +17,6 @@ Help embeds. It cannot be custom set, but it should be avaiable in different lan
 
 ### Line 4:
 Warnings as a dict (warning id - warning content) in a dict (user id - dict)
+
+### Line 5:
+Message that is warned in a dict (warning id - message content)
