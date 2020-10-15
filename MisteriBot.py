@@ -629,4 +629,4 @@ async def google(ctx, *, msg):
     await ctx.send(content=None, embed=embed)
 
 
-client.run('NzA4NTg0MzkzNTU1MzEyNjkw.XrZepA.CkTR9uJFPOPRqr5guU6Un24X09w')
+client.run('TOKEN GOES HERE')
