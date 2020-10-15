@@ -10,6 +10,9 @@ import json
 import ast
 from itertools import cycle
 
+intents = discord.Intents.defauls()
+intents.members = True
+
 #three-digit-error-numbers: public error numbers, which can be seen by everyone; four-digit-error-numbers: internal errors, can only be seen by script host
 
 
@@ -28,17 +31,18 @@ from itertools import cycle
 #⬅️
 #➡️
 #🎲
+#
 
-file = open('prefix.txt', 'r')
-data = file.read()
+prefixfile = open('prefix.txt', 'r')
+data = prefixfile.read()
 data = data.split('\n')
 custom_prefixes = data[0]
 custom_prefixes = ast.literal_eval(custom_prefixes)
 default_prefix = '%'
-file.close()
-
+prefixfile.close()
 
 prefix = ""
+lang = ""
 helpembed1 = discord.Embed()
 helpembed2 = discord.Embed()
 clembed0 = discord.Embed()
@@ -60,42 +64,11 @@ def prefixrefresh():
     global clembed3
     global clembed4
     global clembed5
-    helpembed1 = discord.Embed(title='Hilfe - Seite 1', description='**Tools**\n*Wörter in* ``[eckigen Klammern]`` *müssen* ***ersetzt*** *werden*\n*Wörter in* ``(Klammern)`` *sind* ***optional***\n*Durch* ``/`` *getrennte Wörter sind* ***alternativ***\n-', colour=discord.Colour.from_rgb(r=255, g=127, b=0))
-    helpembed1 = helpembed1.add_field(name='**'+prefix+'clear [(Anzahl)]**', value='Dieser Command **löscht** die nachfolgend angegebene Anzahl an **Nachrichten** (standardgemäß eine). **Angepinnte Nachrichten** werden **ausgelassen**.\n\n*Dieser Command kann nur von Leuten ausgeführt werden, die Nachrichten verwalten dürfen.*', inline=True)
-    helpembed1 = helpembed1.add_field(name='**'+prefix+'clear pinned [(Anzahl)]**', value='Dieser Command **löscht** die nachfolgend angegebene Anzahl an **Nachrichten** (standardgemäß eine), **inklusive** der **angepinnten Nachrichten**\n\n*Dieser Command kann nur von Leuten ausgeführt werden, die Nachrichten verwalten dürfen.*', inline=True)
-    helpembed1 = helpembed1.add_field(name='**'+prefix+'getID (channel/[#CHANNEL]/[@MENTION])**', value='Gibt *deine eigene* (Wenn nachfolgend leer) ID / die ID des *Channels* / die ID des *ausgewählten Channels* / die ID der *ausgewählten Person* aus.\n``Alias: '+prefix+'id``', inline=False)
-    helpembed1 = helpembed1.add_field(name='**'+prefix+'ping**', value='Gibt die Latenz zum Bot im ``ms`` an.\n***Achtung:*** *Die Latenz kann auch durch die Internetleitung des Hosts beeinflusst werden.*', inline=False)
-    helpembed1 = helpembed1.add_field(name='**'+prefix+'embed [Nachricht]**', value='Stellt deine Nachricht als Embed dar.', inline=False)
-    helpembed1 = helpembed1.add_field(name='**'+prefix+'changeprefix [prefix]**', value='Ändert das prefix des Bots. \n\nDieser Command kann nur von Leuten ausgeführt werden, die Webhooks verwalten dürfen.')
-
-    helpembed2 = discord.Embed(title='Hilfe - Seite 2', description='**Misc (Miscellanineous)**\n*Wörter in* ``[eckigen Klammern]`` *müssen* ***ersetzt*** *werden*\n*Wörter in* ``(Klammern)`` *sind* ***optional***\n*Durch* ``/`` *getrennte Wörter sind* ***alternativ***\n-', colour=discord.Colour.from_rgb(r=255, g=127, b=0))
-    helpembed2 = helpembed2.add_field(name='**'+prefix+'wuerfeln [(max. Augenzahl)]**', value='Würfelt eine Zahl von 0 bis zur angegebenen Maximalzahl (wenn leer: 6)')
-    helpembed2 = helpembed2.add_field(name='**'+prefix+'entscheidung [Sache 1] [Sache 2]**', value='Hilft dir, dich zwischen den angegebenen Dingen zu entscheiden.')
-    helpembed2 = helpembed2.add_field(name='**'+prefix+'pc [Name]**', value='Eröffnet einen Textkanal, auf den nur du und die Admins zugriff haben. Mit '+prefix+'``pc_add [@MENTION]`` fügst du deine Freunde hinzu.')
-    helpembed2 = helpembed2.add_field(name='**'+prefix+'google [Suchtext]**', value='Gibt einen Link zur Google-Suche mit dem angegebenen Suchtext aus.')
-    helpembed2 = helpembed2.add_field(name='**'+prefix+'changelog**', value='Eine Übersicht aller Änderungen der jeweiligen Version. Die Versionen können durch Reaktionen durchgeschaltet werden, standartmäßig wird die aktuelle angezeigt.\n*Alias:* ``'+prefix+'cl``')
-    helpembed2 = helpembed2.add_field(name='**'+prefix+'howto**', value='Gibt von mir vorgefertigte Hilfen aus, die ich so nicht im Internet finden konnte.\n Verfügbare *how-tos:*\n-``'+prefix+'howto python save var to file`` - Wie man eine oder mehrere Python Variablen in einer Datei speichern kann, damit die Werte auch nach einem Neustart des Skripts gespeichert bleiben.')
-
-    clembed0 = discord.Embed(title='Es ist kein älterer Changelog verfügbar.', colour=discord.Colour.red())
-    clembed1 = discord.Embed(title='Changelog V4.0', colour=discord.Colour.from_rgb(r=255, g=229, b=196))
-    clembed1 = clembed1.add_field(name='Design', value='-Der ``'+prefix+'help`` -Command ist nun ordendlich in mehreren Embeds, nach Kategorien geordned, die mithilfe von Reaktionen durchgeschaltet und geschlossen werden können.')
-    clembed1 = clembed1.add_field(name='Bugfixes', value='-Beim ``'+prefix+'embed`` - Command wird nun nicht mehr der komplette eingegebene Text inklusive Command angezeigt, sondern nur der gewünschte Text. Dies war zwar schon vorher integriert, wurde aber durch einen Flüchtigkeitsfehler ausser Kraft gesetzt.\n-Beim Ausführen des ``'+prefix+'help`` -Commands wird nicht mehr unendlich Rückmeldung an mich gesendet.\n-Aufgrund eines Updates seitens Discord konnten zwar Privatchats erstellt werden, aber weder Mitglieder hinzugrfügt, noch wieder gelöscht werden. Das Script wurde dementsprechend an die Version angepasst.')
-    clembed1 = clembed1.add_field(name='Neue Funktionen', value='Diese Funktionen gibt es zwar schon, sollten aber eigentlich erst in dieser Version erscheinen.\n-``'+prefix+'google [Suchtext]``: Gibt einen Link zur Google-Suche nach dem angegebenen Suchtext aus.\n-Feedback: Wenn du eine Privatnachricht an diesen Bot sendest, wird diese nun an mich weiter geleitet. [open Alpha!!!]\n-``'+prefix+'changelog``: Das hast du ja schon herausgefunden.')
-    clembed1 = clembed1.add_field(name='Sonstiges', value='-In der Helpnachricht wurde angegeben, dass das Moderatorenteam in Privatchats schauen kann, das kann aber nur der Admin und die Nachricht wurde dementsprechend angepasst.\n-In der Willkommensnachricht wurde auf Funktionen des Bots "Member Count" hingewiesen, der wurde allerdings bereits durch unseren Navnlos ersetzt. Die Nachricht wurde dementsprechend angepasst.')
-    clembed2 = discord.Embed(title='Changelog V4.1', colour=discord.Colour.from_rgb(r=255, g=229, b=196))
-    clembed2 = clembed2.add_field(name='Bugfixes', value='-Die Changelog- und Helpnachrichten, die zum dauerhaften Verweil im Kanal gedacht sind, können nicht mehr durchgeschaltet oder entfernt werden.\n-Farbe im Changelog-Embed angepasst\n-Durch den Changelog kann jetzt fehlerfrei und intuitiv durchgeklickt werden.')
-    clembed2 = clembed2.add_field(name='Sonstiges', value='-``'+prefix+'changelog`` zu ``'+prefix+'help`` hinzugefügt')
-    clembed3 = discord.Embed(title='Changelog V4.2', colour=discord.Colour.from_rgb(r=255, g=229, b=196))
-    clembed3 = clembed3.add_field(name='Bugfixes', value='-Bei ``'+prefix+'help`` und ``'+prefix+'changelog`` wird nur noch ein "schliessen"-Button angezeigt.')
-    clembed3 = clembed3.add_field(name='Design', value='-Beim ``'+prefix+'ping``, ``'+prefix+'entscheidung`` und ``'+prefix+'wuerfeln`` -Command wird die Nachricht nun gelöscht und das Ergebnis in einem Embed dargestellt.\n-Commands, die nur von Moderatoren ausgeführt werden können, werden nun auch gelöscht')
-    clembed3 = clembed3.add_field(name='Sonstiges', value='-Nach ausführen des ``'+prefix+'wuerfeln`` -Commands kann man dank einer Reaktion ganz schnell erneut Würfeln.')
-    clembed4 = discord.Embed(title='Changelog V5.0', colour=discord.Colour.from_rgb(r=255, g=229, b=196))
-    clembed4 = clembed4.add_field(name='Sonstiges:', value='-Würfel-Emoji bei ``'+prefix+'wuerfeln`` zu Standard-Discord-Emoji gemacht\n-Bei ``'+prefix+'wiederruf`` wurde bisher die zuletzt gesendete Nachricht gelöscht, egal, wer diese gesendet hat. Jetzt wird das letzte Feedback des jeweiligen Authors gelöscht, durch erneute Eingabe des Commands kann weiteres Feedback gelöscht werden.\n-Rächtschraipfela koregirt\n-Leute mit der Berechtigung, Nachrichten zu verwalten, können bei bestimmten Commands das Output deaktivieren.\n-Bei ``'+prefix+'entscheidung`` kann nun zwischen unendlich vielen Sachen entschieden werden.')
-    clembed4 = clembed4.add_field(name='Generelles:', value='Am Namen der Version erkennt ihr, dass es ein großes Update ist. Viel davon merken werdet ihr aber nicht, da es eine Interne Umstellung ist. Viele Variablen werden nun in einer seperaten Textdatei gespeichert, was den Vorteil hat, dass z.B. bei dem ``'+prefix+'changelog`` -Command auch noch durchgeschaltet werden kann, wenn der Bot in der Zwischenzeit neu gestartet wurde.')
-    clembed4 = clembed4.add_field(name='Neue Funktionen', value='Der ``'+prefix+'howto``-Command gibt von mir vorgefertigte Hilfestellugnen aus, die ich so nicht im Internet finden konnte. Aktuell ist nur ``'+prefix+'howto python save var to file`` verfügbar.\n-Menschen mit kleinen Hammern aus dem Thor-DLC können nun das prefix des Bots ändern')
-    clembed5 = discord.Embed(title='Es ist kein neuerer Changelog verfügbar.', colour=discord.Colour.red())
-
-
+    global lang
+    global prefix
+    
+        #TODO: Read message file for each language and set global loaded vars
+    
     welcome0 = 'Herzlich Willkommen auf dem MisteriCraft Communityserver, '
     welcome1 = '! Ich werde dich jetzt in den Server einführen. Das komplizierteste ist eigentlich unser Rollensystem. Wir haben zahlreiche Newsletter, viele auch mit themenspezifischen Chats, die man im Kanal ``#rollen-erhalten`` kostenfrei abonnieren kann. Probier es aus!'
     welcome2 = 'Ich denke, die Zeit hat gereicht, um dir eine Rolle zu geben. Führe bitte '+prefix+'help in ``#bot-commands`` aus, um Infos über mich zu erhalten. Ich bin mir sicher, ich kann dir gut behilflich sein. Wenn du Fragen zu einem beliebigen Thema hast oder nicht weiter weißt, zögere nicht, der Anleitung in ``#help`` zu folgen!'
@@ -121,10 +94,12 @@ dicenums = data[7]
 dicenums = json.loads(dicenums)
 diceauthor = data[8]
 diceauthor = json.loads(diceauthor)
+setlanguage_id = data[9]
+setlanguage_id = json.loads(setlanguage_id)
 file.close()
 
 def refresh():
-    datatowrite = str(weiterleitung_id) + '\n' + str(weiterleitung_author_id) + '\n' + str(helpids) + '\n' + str(helppages) + '\n' + str(clids) + '\n' + str(clpages) + '\n' + str(diceids) + '\n' + str(dicenums) + '\n' + str(diceauthor)
+    datatowrite = str(weiterleitung_id) + '\n' + str(weiterleitung_author_id) + '\n' + str(helpids) + '\n' + str(helppages) + '\n' + str(clids) + '\n' + str(clpages) + '\n' + str(diceids) + '\n' + str(dicenums) + '\n' + str(diceauthor) + '\n' + str(setlanguage_id)
     file = open('MisteriBotVars.txt', 'w+')
     file.write(datatowrite)
     file.close()		
@@ -286,6 +261,13 @@ async def on_raw_reaction_add(payload):
                 except:
                     pass
                 refresh()
+        #TODO: Add emojis for language choice
+
+@client.event
+async def on_guild_join(guild):
+    owner = guild.owner
+    await owner.send(content=None, embed=discord.Embed(title="Thanks for adding MisteriBot to your Server!", description="To get started, you have to set up your language. Before this, nothing will work.", colour=discord.Colour.orange()).addfield(name="1. Start", value="Type `*setlanguage` in a channel the Bot is allowed to read and write in.", inline=False).addfield(name="2. Choose your language", value="You see every language the bot can speak. React with the language you want by clicking on the flag.", inline=False).addfield(name="Trubleshooting", value="I am a junior developer and do not know everything, so the language choice is not reliable nor stable. Please contact me by sending a private message to the bot."))
+    #TODO: Send guild owner message which tells him how to set up the language
 
 @client.event
 async def on_message(message):
@@ -294,10 +276,17 @@ async def on_message(message):
     global custom_prefixes
     global client
     if message.guild:
+        if not message.content == '*setlanguage'
+            if language.get(message.guild.id):
+                lang = language.get(message.guild.id)
+            elif message.content.startswith == prefix:
+                await message.channel.send(content=None, embed=discord.Embed(title='Error 002', description='There is no language set up for this guild/server. Please contact server owner, which can set up the language with `*setlanguage`.', colour=discord.Colour.red()))
         if custom_prefixes.get(message.guild.id):
             prefix = custom_prefixes.get(message.guild.id)
         else:
             prefix = default_prefix
+    else:
+        await message.channel.send(content=None, embed=discord.Embed(title='Error 003', description='This Bot is not avaiable in direct chats or an unexpected error occured. Please try again on a guild/server.', colour=discord.Colour.red()))
     prefixrefresh()
     client.command_prefix = prefix
     if isinstance(message.channel, discord.DMChannel) and not message.author.id == 708584393555312690 and not message.author.id == 707242307610476595 and not message.content.startswith(prefix):
@@ -316,6 +305,16 @@ async def on_message(message):
         embed = discord.Embed(title="Das Prefix dieses Servers ist ``"+prefix+"``.", colour=discord.Colour.blue())
         await message.channel.send(content=None, embed=embed)
     await client.process_commands(message)
+
+@client.command()
+@commands.has_permissions(administrator=True)
+async def setlanguage(ctx):
+    embed = discord.Embed(title='Set up your guild/server language', description='Please react with the corresponding flag. We are sorry that we can´t offer you every language on this planet.', colour=discord.Colour.yellow())
+    msg = await ctx.send(content=None, embed=embed)
+    global setlanguage_id
+    setlanguage_id = setlanguage_id.append(msg.id)
+    refresh()
+    await msg.add_reaction(#TODO: Add reaction of german and us flag here)
 
 @client.command()
 @commands.guild_only()
@@ -351,7 +350,7 @@ async def help(ctx):
     await message.add_reaction('⬅️')
     await message.add_reaction('➡️')
     try:
-        await message.add_reaction(':schliessen:732960097344684113')
+        await message.add_reaction(':schliessen:747150589061759006')
     except:
         await message.add_reaction('❎')
 
@@ -377,7 +376,7 @@ async def changelog(ctx):
     await message.add_reaction('⬅️')
     await message.add_reaction('➡️')
     try:
-        await message.add_reaction(':schliessen:732960097344684113')
+        await message.add_reaction(':schliessen:747150589061759006')
     except:
         await message.add_reaction('❎')
 
@@ -518,7 +517,7 @@ async def wuerfeln(ctx, arg=6):
         refresh()
         await msg.add_reaction('🎲')
         try:
-            await msg.add_reaction(':schliessen:732960097344684113')
+            await msg.add_reaction(':schliessen:747150589061759006')
         except:
             await msg.add_reaction('❎')
 
