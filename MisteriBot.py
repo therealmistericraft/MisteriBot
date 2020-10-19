@@ -133,15 +133,61 @@ def refresh():
     file.close()		
 
 
+
+
+
+
+
+
+
+
 #9 Events
 
-#9.1 on_ready: start methods
+#9.1 on_message
+@client.event
+async def on_message(message):
+    global default_prefix
+    global prefix
+    global custom_prefixes
+    global client
+    if message.guild:
+        if not message.content == '*setlanguage'
+            if language.get(message.guild.id):
+                lang = language.get(message.guild.id)
+            elif message.content.startswith == prefix:
+                await message.channel.send(content=None, embed=discord.Embed(title='Error 002', description='There is no language set up for this guild/server. Please contact server owner, which can set up the language with `*setlanguage`.', colour=discord.Colour.red()))
+        if custom_prefixes.get(message.guild.id):
+            prefix = custom_prefixes.get(message.guild.id)
+        else:
+            prefix = default_prefix
+    else:
+        await message.channel.send(content=None, embed=discord.Embed(title='Error 003', description='This Bot is not avaiable in direct chats or an unexpected error occured. Please try again on a guild/server.', colour=discord.Colour.red()))
+    prefixrefresh()
+    client.command_prefix = prefix
+    if isinstance(message.channel, discord.DMChannel) and not message.author.id == client.user.id and not message.content.startswith(prefix):
+        global weiterleitung_id
+        global weiterleitung_author_id
+        weiterleitung_author_id.append(message.author.id)
+        refresh()
+        await message.channel.send('Deine Nachricht wird an meinen Programmierer weitergeleitet. Nutze '+prefix+'wiederruf, um die Nachricht wieder zu löschen.')
+        user = client.get_user(303166734557380608)
+        embed = discord.Embed(title='Feedback von '+str(message.author)+':', description=message.content, colour=discord.Colour.blue())
+        embed.set_author(name=message.author, icon_url=message.author.avatar_url)
+        weiterleitung = await user.send(content=None, embed=embed)
+        weiterleitung_id.append(weiterleitung.id)
+        refresh()
+    if message.content == "prefix":
+        embed = discord.Embed(title="Das Prefix dieses Servers ist ``"+prefix+"``.", colour=discord.Colour.blue())
+        await message.channel.send(content=None, embed=embed)
+    await client.process_commands(message)
+    
+#9.2 on_ready: start methods
 @client.event
 async def on_ready():
     print('Ready.')
     change_status.start()
 
-#9.2 on_member_join: Welcome messages
+#9.3 on_member_join: Welcome messages
 @client.event
 async def on_member_join(member):
     #9.2.1 Welcome messages
@@ -153,7 +199,7 @@ async def on_member_join(member):
         sleep(90)
         await member.send(welcome2)
 
-#9.3 on_raw_reaction_add: handler for user input like close button of 'help' and 'changelog'
+#9.4 on_raw_reaction_add: handler for user input like close button of 'help' and 'changelog'
 @client.event
 async def on_raw_reaction_add(payload):
     #set prefix for payload guild to avoid errors belonging missing prefix
@@ -171,9 +217,11 @@ async def on_raw_reaction_add(payload):
     #except bot reactions
     if not payload.user_id == client.user.id:
         print('Es wurde mit "'+payload.emoji.name+'" reagiert.')
+        #9.3.1 'next'-reaction
         if payload.emoji.name == '➡️':
             global helpids
             global clids
+            #9.3.1.1 'next'-reaction for help messages
             if payload.message_id in helpids:
                 index = helpids.index(payload.message_id)
                 if helppages[index] < 2:
@@ -188,6 +236,7 @@ async def on_raw_reaction_add(payload):
                 if helppages[index] == 2:
                     global helpembed2
                     await message.edit(content=None, embed=helpembed2)
+            #9.3.1.2 'next'-reaction for changelog messages
             if payload.message_id in clids:
                 index = clids.index(payload.message_id)
                 if clpages[index] < 5:
@@ -213,7 +262,9 @@ async def on_raw_reaction_add(payload):
                 if clpages[index] == 5:
                     global clembed5
                     await message.edit(content=None, embed=clembed5)
+        #9.3.2 'before'-reaction
         if payload.emoji.name == '⬅️':
+            #9.3.2.1 'before'-reaction for help-messages
             if payload.message_id in helpids:
                 index = helpids.index(payload.message_id)
                 if helppages[index] > 1:
@@ -230,6 +281,7 @@ async def on_raw_reaction_add(payload):
                     await message.edit(content=None, embed=helpembed1)
                 if helppages[index] == 2:
                     await message.edit(content=None, embed=helpembed2)
+            #9.3.2.2 'before'-reactions for changlog-messages
             if payload.message_id in clids:
                 index = clids.index(payload.message_id)
                 if clpages[index] > 0:
@@ -252,6 +304,7 @@ async def on_raw_reaction_add(payload):
                     await message.edit(content=None, embed=clembed3)
                 if clpages[index] == 4:
                     await message.edit(content=None, embed=clembed4)
+        #9.3.3 'dice'-reactions to roll a new dice for 'dice'-Command
         if payload.emoji.name == '🎲':
             global diceids
             global dicenums
@@ -268,23 +321,27 @@ async def on_raw_reaction_add(payload):
                 embed = discord.Embed(title='Du hast eine ``' + str(dice) + '`` gewürfelt.', colour=discord.Colour.blue())
                 embed.set_author(name=diceauthor[index], icon_url=diceauthor[index].avatar_url)
                 await message.edit(content=None, embed=embed)
+        #9.3.4 'close'-reactions
         if payload.emoji.name == '❎' or payload.emoji.name == 'schliessen':
             if payload.message_id in helpids or payload.message_id in clids or payload.message_id in diceids:
                 channel = client.get_channel(payload.channel_id)
                 message = await channel.fetch_message(payload.message_id)
                 await message.delete()
+                #9.3.4.1 delete object from help-messages
                 try:
                     index = helpids.index(payload.message_id)
                     helpids.pop(index)
                     helppages.pop(index)
                 except:
                     pass
+                #9.3.4.2 delete object from changelog-messages
                 try:
                     index = clids.index(payload.message_id)
                     clids.pop(index)
                     clpages.pop(index)
                 except:
                     pass
+                #9.3.4.3 delete object from dice-messages
                 try:
                     index = diceids.index(payload.message_id)
                     diceids.pop(index)
@@ -294,49 +351,27 @@ async def on_raw_reaction_add(payload):
                 refresh()
         #TODO: Add emojis for language choice
 
+#9.5 on_guild_join: Send tutorial to guild owner how to set up the bot
 @client.event
 async def on_guild_join(guild):
     owner = guild.owner
     await owner.send(content=None, embed=discord.Embed(title="Thanks for adding MisteriBot to your Server!", description="To get started, you have to set up your language. Before this, nothing will work.", colour=discord.Colour.orange()).addfield(name="1. Start", value="Type `*setlanguage` in a channel the Bot is allowed to read and write in.", inline=False).addfield(name="2. Choose your language", value="You see every language the bot can speak. React with the language you want by clicking on the flag.", inline=False).addfield(name="Trubleshooting", value="I am a junior developer and do not know everything, so the language choice is not reliable nor stable. Please contact me by sending a private message to the bot."))
     #TODO: Send guild owner message which tells him how to set up the language
 
-@client.event
-async def on_message(message):
-    global default_prefix
-    global prefix
-    global custom_prefixes
-    global client
-    if message.guild:
-        if not message.content == '*setlanguage'
-            if language.get(message.guild.id):
-                lang = language.get(message.guild.id)
-            elif message.content.startswith == prefix:
-                await message.channel.send(content=None, embed=discord.Embed(title='Error 002', description='There is no language set up for this guild/server. Please contact server owner, which can set up the language with `*setlanguage`.', colour=discord.Colour.red()))
-        if custom_prefixes.get(message.guild.id):
-            prefix = custom_prefixes.get(message.guild.id)
-        else:
-            prefix = default_prefix
-    else:
-        await message.channel.send(content=None, embed=discord.Embed(title='Error 003', description='This Bot is not avaiable in direct chats or an unexpected error occured. Please try again on a guild/server.', colour=discord.Colour.red()))
-    prefixrefresh()
-    client.command_prefix = prefix
-    if isinstance(message.channel, discord.DMChannel) and not message.author.id == 708584393555312690 and not message.author.id == 707242307610476595 and not message.content.startswith(prefix):
-        global weiterleitung_id
-        global weiterleitung_author_id
-        weiterleitung_author_id.append(message.author.id)
-        refresh()
-        await message.channel.send('Deine Nachricht wird an meinen Programmierer weitergeleitet. Nutze '+prefix+'wiederruf, um die Nachricht wieder zu löschen.')
-        user = client.get_user(303166734557380608)
-        embed = discord.Embed(title='Feedback von '+str(message.author)+':', description=message.content, colour=discord.Colour.blue())
-        embed.set_author(name=message.author, icon_url=message.author.avatar_url)
-        weiterleitung = await user.send(content=None, embed=embed)
-        weiterleitung_id.append(weiterleitung.id)
-        refresh()
-    if message.content == "prefix":
-        embed = discord.Embed(title="Das Prefix dieses Servers ist ``"+prefix+"``.", colour=discord.Colour.blue())
-        await message.channel.send(content=None, embed=embed)
-    await client.process_commands(message)
 
+
+
+
+
+
+
+
+
+#10 User Commands
+
+#10.1 Setup
+
+#10.1.1 Language Setup
 @client.command()
 @commands.has_permissions(administrator=True)
 async def setlanguage(ctx):
@@ -347,6 +382,7 @@ async def setlanguage(ctx):
     refresh()
     await msg.add_reaction(#TODO: Add reaction of german and us flag here)
 
+#10.1.2 Prefix Setup
 @client.command()
 @commands.guild_only()
 @commands.has_permissions(manage_webhooks=True)
@@ -359,15 +395,9 @@ async def changeprefix(ctx, arg):
     file.close()
     await ctx.send(content=None, embed=discord.Embed(title='Das prefix wurde erfolgreich zu ``'+custom_prefixes.get(ctx.guild.id)+'`` geändert.', colour=discord.Colour.orange()))
 
-@client.command()
-async def howto(ctx, *, arg):
-    if arg == "python save var to file":
-        backslashn = repr("\n")
-        await ctx.send("**Variablen in Datei Speichern**\n\n1.: `Variablen lesen`\n```python\nfile = open('DATEINAME', 'r')\ndata = file.read()\ndata = data.split('\n')\nvar1 = data[0]\nvar2 = data[1]\n...\n```***Problem:***\nAlle Variablen werden zu einem *string*. Zu einem *integer* kann der wert durch ```python\nint(data[x])\n``` umgewandelt werden, aber bei mir ist es der Fall, dass es sich ausschließlich um *Listen* handelt. Dafür braucht man Spezialwerkzeug: ```python\nimport json\n\nfile = open('DATEINAME', 'r')\ndata = file.read()\ndata = data.split('\n')\nvar1 = data[0]\nprint(type(var1))\n``` ```python\nvar1 = json.loads(var1)\nprint(type(var1))\n``` Durch die *print* Ausdrücke wird die Umwandlung bestätigt/kontrolliert.")
-        await ctx.send("-\n2.: ``Variablen schreiben``\nDamit dies wie gewollt funktioniert, brauchen wir zwei Dinge: `Die Variablen müssen wie oben gelesen werden und in den richtigen Objekttypen umgewandelt werden` und: `Wir brauchen ein Programm, dass die im Skript geänderten Variablen auch in der Datei ändert. Das sieht dann bei mir so aus:` ```python\ndef refresh():\n    datatowrite = str(var1) + "+backslashn+" + str(var2) + "+backslashn+" + str(var3) + "+backslashn+" + str(var4)\n    file = open('DATEINAME.DATEITYP', 'w+')\n    file.write(datatowrite)\n    file.close()\n```")
-        await ctx.send("3.: `Neue Variablen hinzufügen`\n```python\nfile = open('DATEINAME.DATEITYP', 'a')\nvar5 = 'test'\nfile.write(var5)\n```")
-        await ctx.send("**Beachte: Die Datei darf nicht leer sein, sondern muss bereits vor Verwendung je Zeile einen Wert des jeweiligen Typs beinhalten. Die präparierte `.txt` Datei kann dann z.B. so aussehen:** ```python\n#*dateiname.txt*\n[1] #z.B. var1\n1 #z.B. var2\nA #z.B. var3\n[2] #z.B. var4\n``` Die Reihenfolge dieser Werte wird von der Reihenfolge der Variablen in der Variablen `datatowrite` bestimmt; wenn `var1` eine Liste sein soll, muss auch in der `.txt`-Datei in der ersten Zeile ein Wert des Typs `list` stehen.")
+#10.2 Bot Info
 
+#10.2.1 Help
 @client.command()
 async def help(ctx):
     await ctx.channel.purge(limit=1)
@@ -385,6 +415,7 @@ async def help(ctx):
     except:
         await message.add_reaction('❎')
 
+#10.2.1.1 Global Help
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def globalhelp(ctx):
@@ -394,6 +425,7 @@ async def globalhelp(ctx):
     await ctx.send(content=None, embed=helpembed1)
     await ctx.send(content=None, embed=helpembed2)
 
+#10.2.2 Changelog
 @client.command(aliases=['cl'])
 async def changelog(ctx):
     await ctx.channel.purge(limit=1)
@@ -411,6 +443,7 @@ async def changelog(ctx):
     except:
         await message.add_reaction('❎')
 
+#10.2.2.1 Global Changelog
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def globalchangelog(ctx):
@@ -418,61 +451,131 @@ async def globalchangelog(ctx):
     global clembed4
     await ctx.send(content=None, embed=clembed4)
 
-@client.command(aliases=['widerruf'])
-async def wiederruf(ctx):
-    global weiterleitung_id
-    global weiterleitung_author_id
-    i = len(weiterleitung_author_id)-1
-    try:
-        while not weiterleitung_author_id[i] == ctx.message.author.id:
-            i = i-1
+#10.2.3 Info (Not there yet)
+
+#10.3 Plain Text Commands
+
+#10.3.1 Ping
+@client.command()
+async def ping(ctx):
+    await ctx.channel.purge(limit=1)
+    if isinstance(ctx.message.channel, discord.DMChannel):
+        await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
+    else:
+        ping = round(client.latency*1000)
+        embed = discord.Embed(title='Der aktuelle Ping beträgt ``'+str(ping)+'``ms.')
+        embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
+        await ctx.send(content=None, embed=embed)
+
+#10.3.2 Dice
+@client.command(aliases=['roll','wuerfeln'])
+async def dice(ctx, arg=6):
+    await ctx.channel.purge(limit=1)
+    if isinstance(ctx.message.channel, discord.DMChannel):
+        await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
+    else:
+        dice = random.randint(1, arg)
+        embed = discord.Embed(title='Du hast eine ``'+str(dice)+'`` gewürfelt.', colour=discord.Colour.blue())
+        embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
+        msg = await ctx.send(content=None, embed=embed)
+        global diceids
+        global dicenums
+        global diceauthor
+        diceauthor.append(ctx.message.author)
+        refresh()
+        diceids.append(msg.id)
+        refresh()
+        dicenums.append(arg)
+        refresh()
+        await msg.add_reaction('🎲')
+        try:
+            await msg.add_reaction(':schliessen:747150589061759006')
+        except:
+            await msg.add_reaction('❎')
+
+#10.3.3 Decision
+@client.command(aliases=['zufall','zufallsgenerator','entscheidung'])
+async def decision(ctx, *, arg):
+    await ctx.channel.purge(limit=1)
+    if isinstance(ctx.message.channel, discord.DMChannel):
+        await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
+    else:
+        arg = arg.split(' ')
+        zufall = random.randint(0, len(arg)-1)
+        embed = discord.Embed(title='Der MisteriBot hat sich für ``'+arg[zufall]+'`` entschieden.', colour=discord.Colour.light_grey())
+        embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
+        await ctx.send(content=None, embed=embed)
+
+#10.3.4 how-to (Only german)
+@client.command()
+async def howto(ctx, *, arg):
+    if arg == "python save var to file":
+        backslashn = repr("\n")
+        await ctx.send("**Variablen in Datei Speichern**\n\n1.: `Variablen lesen`\n```python\nfile = open('DATEINAME', 'r')\ndata = file.read()\ndata = data.split('\n')\nvar1 = data[0]\nvar2 = data[1]\n...\n```***Problem:***\nAlle Variablen werden zu einem *string*. Zu einem *integer* kann der wert durch ```python\nint(data[x])\n``` umgewandelt werden, aber bei mir ist es der Fall, dass es sich ausschließlich um *Listen* handelt. Dafür braucht man Spezialwerkzeug: ```python\nimport json\n\nfile = open('DATEINAME', 'r')\ndata = file.read()\ndata = data.split('\n')\nvar1 = data[0]\nprint(type(var1))\n``` ```python\nvar1 = json.loads(var1)\nprint(type(var1))\n``` Durch die *print* Ausdrücke wird die Umwandlung bestätigt/kontrolliert.")
+        await ctx.send("-\n2.: ``Variablen schreiben``\nDamit dies wie gewollt funktioniert, brauchen wir zwei Dinge: `Die Variablen müssen wie oben gelesen werden und in den richtigen Objekttypen umgewandelt werden` und: `Wir brauchen ein Programm, dass die im Skript geänderten Variablen auch in der Datei ändert. Das sieht dann bei mir so aus:` ```python\ndef refresh():\n    datatowrite = str(var1) + "+backslashn+" + str(var2) + "+backslashn+" + str(var3) + "+backslashn+" + str(var4)\n    file = open('DATEINAME.DATEITYP', 'w+')\n    file.write(datatowrite)\n    file.close()\n```")
+        await ctx.send("3.: `Neue Variablen hinzufügen`\n```python\nfile = open('DATEINAME.DATEITYP', 'a')\nvar5 = 'test'\nfile.write(var5)\n```")
+        await ctx.send("**Beachte: Die Datei darf nicht leer sein, sondern muss bereits vor Verwendung je Zeile einen Wert des jeweiligen Typs beinhalten. Die präparierte `.txt` Datei kann dann z.B. so aussehen:** ```python\n#*dateiname.txt*\n[1] #z.B. var1\n1 #z.B. var2\nA #z.B. var3\n[2] #z.B. var4\n``` Die Reihenfolge dieser Werte wird von der Reihenfolge der Variablen in der Variablen `datatowrite` bestimmt; wenn `var1` eine Liste sein soll, muss auch in der `.txt`-Datei in der ersten Zeile ein Wert des Typs `list` stehen.")
+
+#10.3.5 getID
+@client.command(aliases=['id','getid','gid'])
+async def getID(ctx, arg=' '):
+    await ctx.channel.purge(limit=1)
+    if isinstance(ctx.message.channel, discord.DMChannel):
+        await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
+    else:
+        #10.3.5.1 Own ID
+        if arg == ' ':
+            id = ctx.author.id
+            embed = discord.Embed(title='Deine ID ist: ``'+str(id)+'``.', colour=discord.Colour.purple())
+        #10.3.5.2 Channel ID
+        if arg == 'channel':
+            id = ctx.channel.id
+            embed = discord.Embed(title='Die ID des Channels ist ``'+str(id)+'``.', colour=discord.Colour.purple())
+        #10.3.5.3 Other User´s ID
+        if arg.startswith('<@'):
+            arg = arg.replace('<', '')
+            arg = arg.replace('>', '')
+            arg = arg.replace('@', '')
+            arg = arg.replace('!', '')
+            arg = arg.replace('&', '')
+            id = arg
+            embed = discord.Embed(title='Die ID des ausgewählten Members ist ``'+str(id)+ '``.', colour=discord.Colour.purple())
+        #10.3.5.4 Other Channel´s ID
+        if arg.startswith('<#'):
+            arg = arg.replace('<', '')
+            arg = arg.replace('#', '')
+            arg = arg.replace('#', '')
+            arg = arg.replace('>', '')
+            id = arg
+            embed = discord.Embed(title='Die ID des ausgewählten Channels ist ``'+str(id)+'``.', colour=discord.Colour.purple())
+        embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
+        await ctx.send(content=None, embed=embed)
+
+#10.3.6 Google search
+@client.command()
+async def google(ctx, *, msg):
+    test = True
+    while test == True:
+        message = message.replace(' ', '+')
+        if ' ' in message.lower():
+            test = True
         else:
-            msg = await ctx.message.channel.fetch_message(weiterleitung_id[i])
-            await msg.edit(content=None, embed=discord.Embed(title='Fehler 0001', colour=discord.Colour.red(), description='Die Nachricht wurde auf Wunsch des Verfassers gelöscht.'))
-            weiterleitung_author_id.pop(i)
-            refresh()
-            weiterleitung_id.pop(i)
-            refresh()
-    except:
-        error = discord.Embed(title='Fehler 001', colour=discord.Colour.red(), description='Ich konnte kein Feedback von dir finden.')
-        await ctx.send(content=None, embed=error)
+            test = False
+    link = 'https://www.google.com/search?&q='+message
+    embed = discord.Embed(title='Google-Suche: '+msg, description=link)
+    await ctx.send(content=None, embed=embed)
 
-#Dieser Command löscht die ausgewählte Anzahl an Nachrichten.
-@client.command(aliases=['c'])
-@commands.has_permissions(manage_messages=True)
-async def clear(ctx, arg=''):
-    if arg == '' or arg == '-nogui' or arg == 'pinned':
-        num = 1
-    else:
-        num = int(arg)
-    if 'pinned' in ctx.message.content:
-        await ctx.channel.purge(limit=num+1)
-        if '-nogui' not in ctx.message.content:
-            embed = discord.Embed(title='Es wurden ``'+str(num)+'`` Nachrichten inklusive der angepinnten Nachrichten gelöscht.', colour=discord.Colour.orange())
-            embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
-            msg = await ctx.send(content=None, embed=embed)
-            sleep(5)
-            await msg.delete()
-    else:
-        await ctx.channel.purge(limit=num+1, check=lambda msg: not msg.pinned)
-        if '-nogui' not in ctx.message.content:
-            embed = discord.Embed(title='Es wurden ``'+str(num)+'`` Nachrichten exklusive der angepinnten Nachrichten gelöscht.', colour=discord.Colour.orange())
-            embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
-            msg = await ctx.send(content=None, embed=embed)
-            sleep(5)
-            await msg.delete()
+#10.3.7 Embed
+@client.command()
+async def embed(ctx, *, msg):
+    await ctx.channel.purge(limit=1)
+    embed= discord.Embed(description=msg1, colour=discord.Colour.dark_grey())
+    embed.set_author(name=ctx.message.author,icon_url=ctx.author.avatar_url)
+    await ctx.send(content=None, embed=embed)
 
-@client.command(pass_context=True)
-@commands.has_permissions(manage_roles=True)
-async def pc_delete(ctx, name):
-    if str(discord.utils.get(ctx.message.author.guild.roles, name=name)) == 'None':
-        await ctx.send('Dieser Privatchat wurde nicht gefunden.')
-    else:
-        guild = ctx.message.guild
-        await discord.CategoryChannel.delete(get(guild.channels, name=name), reason='Der Kanal (Ein Privatchat) wurde durch den Nutzer gelöscht, offensichtlich wurde er nicht mehr benötigt.')
-        await discord.Role.delete(get(guild.roles, name=name),reason='Die Rolle zu einem Privatchat wurde durch den Nutzer gelöscht, offensichtlich wurde sie nicht mehr benötigt.')
-        await discord.Role.delete(get(guild.roles, name='{}-admin'.format(name)),reason='Die Rolle zu einem Privatchat wurde durch den Nutzer gelöscht, offensichtlich wurde sie nicht mehr benötigt.')
+#10.4 Action Commands
 
+#10.4.1 Private Chats
 @client.command(aliases=['personal_channel', 'private_chat', 'privatchat'])
 async def pc(ctx, name):
     if isinstance(ctx.message.channel, discord.DMChannel):
@@ -514,7 +617,20 @@ async def pc(ctx, name):
                 msg1 = await ctx.message.channel.fetch_message(ctx.message.id)
                 await msg.delete()
                 await msg1.delete()
-
+                
+#10.4.2 Private Chat Delete
+@client.command(pass_context=True)
+@commands.has_permissions(manage_roles=True)
+async def pc_delete(ctx, name):
+    if str(discord.utils.get(ctx.message.author.guild.roles, name=name)) == 'None':
+        await ctx.send('Dieser Privatchat wurde nicht gefunden.')
+    else:
+        guild = ctx.message.guild
+        await discord.CategoryChannel.delete(get(guild.channels, name=name), reason='Der Kanal (Ein Privatchat) wurde durch den Nutzer gelöscht, offensichtlich wurde er nicht mehr benötigt.')
+        await discord.Role.delete(get(guild.roles, name=name),reason='Die Rolle zu einem Privatchat wurde durch den Nutzer gelöscht, offensichtlich wurde sie nicht mehr benötigt.')
+        await discord.Role.delete(get(guild.roles, name='{}-admin'.format(name)),reason='Die Rolle zu einem Privatchat wurde durch den Nutzer gelöscht, offensichtlich wurde sie nicht mehr benötigt.')
+        
+#10.4.3 Private Chat Person Add
 @client.command()
 async def pc_add(ctx, p: discord.Member):
     if isinstance(ctx.message.channel, discord.DMChannel):
@@ -526,32 +642,81 @@ async def pc_add(ctx, p: discord.Member):
         await p.add_roles(role)
         await ctx.send(str(p)+' hat nun Zugriff auf diesen Kanal.')
 
-#Dieser Command würfelt eine Zahl von 1-6
-@client.command(aliases=['roll','dice'])
-async def wuerfeln(ctx, arg=6):
-    await ctx.channel.purge(limit=1)
+#10.5 Essentials
+
+#10.5.1 Widerruf
+@client.command(aliases=['widerruf'])
+async def wiederruf(ctx):
+    global weiterleitung_id
+    global weiterleitung_author_id
+    i = len(weiterleitung_author_id)-1
+    try:
+        while not weiterleitung_author_id[i] == ctx.message.author.id:
+            i = i-1
+        else:
+            msg = await ctx.message.channel.fetch_message(weiterleitung_id[i])
+            await msg.edit(content=None, embed=discord.Embed(title='Fehler 0001', colour=discord.Colour.red(), description='Die Nachricht wurde auf Wunsch des Verfassers gelöscht.'))
+            weiterleitung_author_id.pop(i)
+            refresh()
+            weiterleitung_id.pop(i)
+            refresh()
+    except:
+        error = discord.Embed(title='Fehler 001', colour=discord.Colour.red(), description='Ich konnte kein Feedback von dir finden.')
+        await ctx.send(content=None, embed=error)
+        
+#10.6 Easter Eggs
+
+#10.6.1 fish
+@client.command()
+async def fish(ctx):
     if isinstance(ctx.message.channel, discord.DMChannel):
         await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
     else:
-        dice = random.randint(1, arg)
-        embed = discord.Embed(title='Du hast eine ``'+str(dice)+'`` gewürfelt.', colour=discord.Colour.blue())
-        embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
-        msg = await ctx.send(content=None, embed=embed)
-        global diceids
-        global dicenums
-        global diceauthor
-        diceauthor.append(ctx.message.author)
-        refresh()
-        diceids.append(msg.id)
-        refresh()
-        dicenums.append(arg)
-        refresh()
-        await msg.add_reaction('🎲')
-        try:
-            await msg.add_reaction(':schliessen:747150589061759006')
-        except:
-            await msg.add_reaction('❎')
+        embed = discord.Embed(title='´Blub.´ :tropical_fish:', colour=discord.Colour.dark_blue())
+        await ctx.channel.purge(limit=1)
+        await ctx.send(content=None, embed=embed)
 
+
+
+
+
+
+
+
+
+
+#11 Moderator Commands
+
+#11.1 Clear
+@client.command(aliases=['c'])
+@commands.has_permissions(manage_messages=True)
+async def clear(ctx, arg=''):
+    #if no number passed
+    if arg == '' or arg == '-nogui' or arg == 'pinned':
+        num = 1
+    #if number passed
+    else:
+        num = int(arg)
+    #11.1.1 Clear Messages with pinned Messages
+    if 'pinned' in ctx.message.content:
+        await ctx.channel.purge(limit=num+1)
+        if '-nogui' not in ctx.message.content:
+            embed = discord.Embed(title='Es wurden ``'+str(num)+'`` Nachrichten inklusive der angepinnten Nachrichten gelöscht.', colour=discord.Colour.orange())
+            embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
+            msg = await ctx.send(content=None, embed=embed)
+            sleep(5)
+            await msg.delete()
+    #11.1.2 Clear Messages without pinned Messages
+    else:
+        await ctx.channel.purge(limit=num+1, check=lambda msg: not msg.pinned)
+        if '-nogui' not in ctx.message.content:
+            embed = discord.Embed(title='Es wurden ``'+str(num)+'`` Nachrichten exklusive der angepinnten Nachrichten gelöscht.', colour=discord.Colour.orange())
+            embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
+            msg = await ctx.send(content=None, embed=embed)
+            sleep(5)
+            await msg.delete()
+
+#11.2 Spam
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def spam(ctx, arg, arg1='', arg2='', arg3='', arg4=''):
@@ -569,68 +734,18 @@ async def spam(ctx, arg, arg1='', arg2='', arg3='', arg4=''):
     await ctx.send(message)
     await ctx.send(message)
 
-@client.command()
-async def fish(ctx):
-    if isinstance(ctx.message.channel, discord.DMChannel):
-        await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
-    else:
-        embed = discord.Embed(title='´Blub.´ :tropical_fish:', colour=discord.Colour.dark_blue())
-        await ctx.channel.purge(limit=1)
-        await ctx.send(content=None, embed=embed)
 
-@client.command(aliases=['zufall','zufallsgenerator'])
-async def entscheidung(ctx, *, arg):
-    await ctx.channel.purge(limit=1)
-    if isinstance(ctx.message.channel, discord.DMChannel):
-        await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
-    else:
-        arg = arg.split(' ')
-        zufall = random.randint(0, len(arg)-1)
-        embed = discord.Embed(title='Der MisteriBot hat sich für ``'+arg[zufall]+'`` entschieden.', colour=discord.Colour.light_grey())
-        embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
-        await ctx.send(content=None, embed=embed)
 
-@client.command(aliases=['id','getid','gid'])
-async def getID(ctx, arg=' '):
-    await ctx.channel.purge(limit=1)
-    if isinstance(ctx.message.channel, discord.DMChannel):
-        await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
-    else:
-        if arg == ' ':
-            id = ctx.author.id
-            embed = discord.Embed(title='Deine ID ist: ``'+str(id)+'``.', colour=discord.Colour.purple())
-        if arg == 'channel':
-            id = ctx.channel.id
-            embed = discord.Embed(title='Die ID des Channels ist ``'+str(id)+'``.', colour=discord.Colour.purple())
-        if arg.startswith('<@'):
-            arg = arg.replace('<', '')
-            arg = arg.replace('>', '')
-            arg = arg.replace('@', '')
-            arg = arg.replace('!', '')
-            arg = arg.replace('&', '')
-            id = arg
-            embed = discord.Embed(title='Die ID des ausgewählten Members ist ``'+str(id)+ '``.', colour=discord.Colour.purple())
-        if arg.startswith('<#'):
-            arg = arg.replace('<', '')
-            arg = arg.replace('#', '')
-            arg = arg.replace('#', '')
-            arg = arg.replace('>', '')
-            id = arg
-            embed = discord.Embed(title='Die ID des ausgewählten Channels ist ``'+str(id)+'``.', colour=discord.Colour.purple())
-        embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
-        await ctx.send(content=None, embed=embed)
 
-@client.command()
-async def ping(ctx):
-    await ctx.channel.purge(limit=1)
-    if isinstance(ctx.message.channel, discord.DMChannel):
-        await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
-    else:
-        ping = round(client.latency*1000)
-        embed = discord.Embed(title='Der aktuelle Ping beträgt ``'+str(ping)+'``ms.')
-        embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
-        await ctx.send(content=None, embed=embed)
 
+
+
+
+
+
+#12 MisteriCraft Commands
+
+#12.1 write
 @client.command()
 async def write(ctx):
     await ctx.channel.purge(limit=1)
@@ -639,25 +754,14 @@ async def write(ctx):
         msg1=msg.replace('*write', '')
         await ctx.send(msg1)
 
-@client.command()
-async def embed(ctx, *, msg):
-    await ctx.channel.purge(limit=1)
-    embed= discord.Embed(description=msg1, colour=discord.Colour.dark_grey())
-    embed.set_author(name=ctx.message.author,icon_url=ctx.author.avatar_url)
-    await ctx.send(content=None, embed=embed)
-
-@client.command()
-async def google(ctx, *, msg):
-    test = True
-    while test == True:
-        message = message.replace(' ', '+')
-        if ' ' in message.lower():
-            test = True
-        else:
-            test = False
-    link = 'https://www.google.com/search?&q='+message
-    embed = discord.Embed(title='Google-Suche: '+msg, description=link)
-    await ctx.send(content=None, embed=embed)
 
 
+
+
+
+
+
+
+
+#13 Runtime
 client.run('#TODO: Add token')
