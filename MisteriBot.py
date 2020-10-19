@@ -1,5 +1,6 @@
 # coding=utf-8
 
+#1 imports
 import discord
 from discord.ext import commands
 from discord.ext import tasks
@@ -10,13 +11,28 @@ import json
 import ast
 from itertools import cycle
 
+
+#2 settings
+
+#2.1 Activate member objects from API
 intents = discord.Intents.defauls()
 intents.members = True
+
+#2.2 Set Bot´s custom status
+status = cycle([str(len(client.guilds))+" guilds", "bit.ly/misteribot"])
+
+#2.3 Start custom status cyclus
+@tasks.loop(seconds=10)
+async def change_status():
+    await client.change_presence(status=discord.Status.online,activity=discord.Activity(type=discord.ActivityType.listening, name=next(status)))
+
+
+#3 notes
 
 #three-digit-error-numbers: public error numbers, which can be seen by everyone; four-digit-error-numbers: internal errors, can only be seen by script host
 
 
-#clipboard
+#4 clipboard
 #1️⃣
 #2️⃣
 #3️⃣
@@ -33,14 +49,8 @@ intents.members = True
 #🎲
 #
 
-prefixfile = open('prefix.txt', 'r')
-data = prefixfile.read()
-data = data.split('\n')
-custom_prefixes = data[0]
-custom_prefixes = ast.literal_eval(custom_prefixes)
-default_prefix = '%'
-prefixfile.close()
 
+#5 create variables
 prefix = ""
 lang = ""
 helpembed1 = discord.Embed()
@@ -52,27 +62,19 @@ clembed3 = discord.Embed()
 clembed4 = discord.Embed()
 clembed5 = discord.Embed()
 
-client = commands.Bot(command_prefix = "%")
-client.remove_command('help')
 
-def prefixrefresh():
-    global helpembed1
-    global helpembed2
-    global clembed0
-    global clembed1
-    global clembed2
-    global clembed3
-    global clembed4
-    global clembed5
-    global lang
-    global prefix
-    
-        #TODO: Read message file for each language and set global loaded vars
-    
-    welcome0 = 'Herzlich Willkommen auf dem MisteriCraft Communityserver, '
-    welcome1 = '! Ich werde dich jetzt in den Server einführen. Das komplizierteste ist eigentlich unser Rollensystem. Wir haben zahlreiche Newsletter, viele auch mit themenspezifischen Chats, die man im Kanal ``#rollen-erhalten`` kostenfrei abonnieren kann. Probier es aus!'
-    welcome2 = 'Ich denke, die Zeit hat gereicht, um dir eine Rolle zu geben. Führe bitte '+prefix+'help in ``#bot-commands`` aus, um Infos über mich zu erhalten. Ich bin mir sicher, ich kann dir gut behilflich sein. Wenn du Fragen zu einem beliebigen Thema hast oder nicht weiter weißt, zögere nicht, der Anleitung in ``#help`` zu folgen!'
+#6 Loadings from files (initalizing)
 
+#6.1 prefix loading
+prefixfile = open('prefix.txt', 'r')
+data = prefixfile.read()
+data = data.split('\n')
+custom_prefixes = data[0]
+custom_prefixes = ast.literal_eval(custom_prefixes)
+default_prefix = '%'
+prefixfile.close()
+
+#6.2 load data from 'MisteriBotVars.txt' and save it to initalized (created) variables [from #6]
 file = open('MisteriBotVars.txt', 'r')
 data = file.read()
 data = data.split('\n')
@@ -98,25 +100,51 @@ setlanguage_id = data[9]
 setlanguage_id = json.loads(setlanguage_id)
 file.close()
 
+
+#7 create bot instance
+client = commands.Bot(command_prefix = "%")
+client.remove_command('help')
+
+
+#8 custom methods
+
+#8.1 adds custom guild prefix to texts
+def prefixrefresh():
+    global helpembed1
+    global helpembed2
+    global clembed0
+    global clembed1
+    global clembed2
+    global clembed3
+    global clembed4
+    global clembed5
+    global lang
+    global prefix
+    #TODO: Read message file for each language and set global loaded vars
+    welcome0 = 'Herzlich Willkommen auf dem MisteriCraft Communityserver, '
+    welcome1 = '! Ich werde dich jetzt in den Server einführen. Das komplizierteste ist eigentlich unser Rollensystem. Wir haben zahlreiche Newsletter, viele auch mit themenspezifischen Chats, die man im Kanal ``#rollen-erhalten`` kostenfrei abonnieren kann. Probier es aus!'
+    welcome2 = 'Ich denke, die Zeit hat gereicht, um dir eine Rolle zu geben. Führe bitte '+prefix+'help in ``#bot-commands`` aus, um Infos über mich zu erhalten. Ich bin mir sicher, ich kann dir gut behilflich sein. Wenn du Fragen zu einem beliebigen Thema hast oder nicht weiter weißt, zögere nicht, der Anleitung in ``#help`` zu folgen!'
+
+#8.2 save changed variables loaded in #6.2
 def refresh():
     datatowrite = str(weiterleitung_id) + '\n' + str(weiterleitung_author_id) + '\n' + str(helpids) + '\n' + str(helppages) + '\n' + str(clids) + '\n' + str(clpages) + '\n' + str(diceids) + '\n' + str(dicenums) + '\n' + str(diceauthor) + '\n' + str(setlanguage_id)
     file = open('MisteriBotVars.txt', 'w+')
     file.write(datatowrite)
     file.close()		
 
-status = cycle([str(len(client.guilds))+" guilds", "bit.ly/misteribot"])
 
-@tasks.loop(seconds=10)
-async def change_status():
-    await client.change_presence(status=discord.Status.online,activity=discord.Activity(type=discord.ActivityType.listening, name=next(status)))
+#9 Events
 
+#9.1 on_ready: start methods
 @client.event
 async def on_ready():
     print('Ready.')
     change_status.start()
 
+#9.2 on_member_join: Welcome messages
 @client.event
 async def on_member_join(member):
+    #9.2.1 Welcome messages
     if member.guild.id == 304191437652623360:
         global welcome0
         global welcome1
@@ -125,8 +153,10 @@ async def on_member_join(member):
         sleep(90)
         await member.send(welcome2)
 
+#9.3 on_raw_reaction_add: handler for user input like close button of 'help' and 'changelog'
 @client.event
 async def on_raw_reaction_add(payload):
+    #set prefix for payload guild to avoid errors belonging missing prefix
     global default_prefix
     global prefix
     global custom_prefixes
@@ -138,7 +168,8 @@ async def on_raw_reaction_add(payload):
             prefix = default_prefix
     prefixrefresh()
     client.command_prefix = prefix
-    if not payload.user_id == 707242307610476595 and not payload.user_id == 708584393555312690:
+    #except bot reactions
+    if not payload.user_id == client.user.id:
         print('Es wurde mit "'+payload.emoji.name+'" reagiert.')
         if payload.emoji.name == '➡️':
             global helpids
@@ -629,4 +660,4 @@ async def google(ctx, *, msg):
     await ctx.send(content=None, embed=embed)
 
 
-client.run('NzA4NTg0MzkzNTU1MzEyNjkw.XrZepA.CkTR9uJFPOPRqr5guU6Un24X09w')
+client.run('#TODO: Add token')
