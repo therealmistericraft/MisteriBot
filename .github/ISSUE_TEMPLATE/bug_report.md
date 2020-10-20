@@ -20,14 +20,14 @@ Please make a step-by-step list.*
 *Describe what happend detailed.*
 
 ### Expected behavior
-A clear and concise description of what you expected to happen.
+*What should have happend?*
 
 ### Attachements
 *If possible, add screenshots and links.*
 
 ### Device and software
-* Model Name (leave empty if not applicable): 
-* Discord Version:
+- Model Name (leave empty if not applicable): 
+- Discord Version:
 *Please Choose what applies:*
 - [x] Operating System:
 - [] Web App
