@@ -118,6 +118,9 @@ def refresh():
     file.write(datatowrite)
     file.close()		
 
+	
+# beginning of bot-commands	
+
 @client.event
 async def on_ready():
     print('Ready.')
@@ -134,93 +137,122 @@ async def on_member_join(member):
 
 @client.event
 async def on_raw_reaction_add(payload):
+	
     if not payload.user_id == 707242307610476595 and not payload.user_id == 708584393555312690:
         print('Es wurde mit "'+payload.emoji.name+'" reagiert.')
+	
         if payload.emoji.name == '➡️':
             global helpids
             global clids
+		
             if payload.message_id in helpids:
                 index = helpids.index(payload.message_id)
+		
                 if helppages[index] < 2:
                     helppages[index] += 1
                     refresh()
+			
                 channel = client.get_channel(payload.channel_id)
                 message = await channel.fetch_message(payload.message_id)
                 guild_id = payload.guild_id
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
+		
                 if helppages[index] == 2:
                     global helpembed2
                     await message.edit(content=None, embed=helpembed2)
+			
             if payload.message_id in clids:
                 index = clids.index(payload.message_id)
+		
                 if clpages[index] < 5:
                     clpages[index] += 1
                     refresh()
+			
                 channel = client.get_channel(payload.channel_id)
                 message = await channel.fetch_message(payload.message_id)
                 guild_id = payload.guild_id
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
+		
                 if clpages[index] == 1:
                     await message.edit(content=None, embed=clembed1)
+		
                 if clpages[index] == 2:
                     global clembed2
                     await message.edit(content=None, embed=clembed2)
+			
                 if clpages[index] == 3:
                     global clembed3
                     await message.edit(content=None, embed=clembed3)
+			
                 if clpages[index] == 4:
                     global clembed4
                     await message.edit(content=None, embed=clembed4)
+			
                 if clpages[index] == 5:
                     global clembed5
                     await message.edit(content=None, embed=clembed5)
+			
         if payload.emoji.name == '⬅️':
             if payload.message_id in helpids:
                 index = helpids.index(payload.message_id)
+		
                 if helppages[index] > 1:
                     helppages[index] -= 1
                     refresh()
+			
                 channel = client.get_channel(payload.channel_id)
                 message = await channel.fetch_message(payload.message_id)
                 guild_id = payload.guild_id
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
+		
                 if helppages[index] == 1:
                     global helpembed1
                     await message.edit(content=None, embed=helpembed1)
+			
                 if helppages[index] == 2:
                     await message.edit(content=None, embed=helpembed2)
+		
             if payload.message_id in clids:
                 index = clids.index(payload.message_id)
+		
                 if clpages[index] > 0:
                     clpages[index] -= 1
                     refresh()
+			
                 channel = client.get_channel(payload.channel_id)
                 message = await channel.fetch_message(payload.message_id)
                 guild_id = payload.guild_id
                 guild = discord.utils.find(lambda g: g.id == guild_id, client.guilds)
                 member = discord.utils.find(lambda m: m.id == payload.user_id, guild.members)
                 await message.remove_reaction(payload.emoji, member)
+		
                 if clpages[index] == 0:
                     global clembed0
                     await message.edit(content=None, embed=clembed0)
+			
                 if clpages[index] == 1:
                     await message.edit(content=None, embed=clembed1)
+		
                 if clpages[index] == 2:
                     await message.edit(content=None, embed=clembed2)
+		
                 if clpages[index] == 3:
                     await message.edit(content=None, embed=clembed3)
+		
                 if clpages[index] == 4:
                     await message.edit(content=None, embed=clembed4)
+		
         if payload.emoji.name == '🎲':
             global diceids
             global dicenums
             global diceauthor
+	
             if payload.message_id in diceids:
                 channel = client.get_channel(payload.channel_id)
                 message = await channel.fetch_message(payload.message_id)
@@ -233,6 +265,7 @@ async def on_raw_reaction_add(payload):
                 embed = discord.Embed(title='Du hast eine ``' + str(dice) + '`` gewürfelt.', colour=discord.Colour.blue())
                 embed.set_author(name=diceauthor[index], icon_url=diceauthor[index].avatar_url)
                 await message.edit(content=None, embed=embed)
+		
         if payload.emoji.name == '❎' or payload.emoji.name == 'schliessen':
             if payload.message_id in helpids or payload.message_id in clids or payload.message_id in diceids:
                 channel = client.get_channel(payload.channel_id)
@@ -244,6 +277,7 @@ async def on_message(message):
     global prefix
     global client
     prefix = determine_prefix(message = message, bot = client)
+
     if isinstance(message.channel, discord.DMChannel) and not message.author.id == 708584393555312690 and not message.author.id == 707242307610476595 and not message.content.startswith(prefix):
         global weiterleitung_id
         global weiterleitung_author_id
@@ -257,6 +291,7 @@ async def on_message(message):
         weiterleitung_id.append(weiterleitung.id)
         refresh()
     await client.process_commands(message)
+
 
 @client.command()
 @commands.guild_only()
@@ -291,8 +326,10 @@ async def help(ctx):
     refresh()
     await message.add_reaction('⬅️')
     await message.add_reaction('➡️')
+	
     try:
         await message.add_reaction(':schliessen:732960097344684113')
+	
     except:
         await message.add_reaction('❎')
 
@@ -317,8 +354,10 @@ async def changelog(ctx):
     refresh()
     await message.add_reaction('⬅️')
     await message.add_reaction('➡️')
+	
     try:
         await message.add_reaction(':schliessen:732960097344684113')
+	
     except:
         await message.add_reaction('❎')
 
@@ -334,9 +373,11 @@ async def wiederruf(ctx):
     global weiterleitung_id
     global weiterleitung_author_id
     i = len(weiterleitung_author_id)-1
+
     try:
         while not weiterleitung_author_id[i] == ctx.message.author.id:
             i = i-1
+	
         else:
             msg = await ctx.message.channel.fetch_message(weiterleitung_id[i])
             await msg.edit(content=None, embed=discord.Embed(title='Fehler 0001', colour=discord.Colour.red(), description='Die Nachricht wurde auf Wunsch des Verfassers gelöscht.'))
@@ -344,6 +385,7 @@ async def wiederruf(ctx):
             refresh()
             weiterleitung_id.pop(i)
             refresh()
+		
     except:
         error = discord.Embed(title='Fehler 001', colour=discord.Colour.red(), description='Ich konnte kein Feedback von dir finden.')
         await ctx.send(content=None, embed=error)
@@ -354,8 +396,10 @@ async def wiederruf(ctx):
 async def clear(ctx, arg=''):
     if arg == '' or arg == '-nogui' or arg == 'pinned':
         num = 1
+	
     else:
         num = int(arg)
+	
     if 'pinned' in ctx.message.content:
         await ctx.channel.purge(limit=num+1)
         if '-nogui' not in ctx.message.content:
@@ -364,6 +408,7 @@ async def clear(ctx, arg=''):
             msg = await ctx.send(content=None, embed=embed)
             sleep(5)
             await msg.delete()
+	
     else:
         await ctx.channel.purge(limit=num+1, check=lambda msg: not msg.pinned)
         if '-nogui' not in ctx.message.content:
@@ -378,6 +423,7 @@ async def clear(ctx, arg=''):
 async def pc_delete(ctx, name):
     if str(discord.utils.get(ctx.message.author.guild.roles, name=name)) == 'None':
         await ctx.send('Dieser Privatchat wurde nicht gefunden.')
+	
     else:
         guild = ctx.message.guild
         await discord.CategoryChannel.delete(get(guild.channels, name=name), reason='Der Kanal (Ein Privatchat) wurde durch den Nutzer gelöscht, offensichtlich wurde er nicht mehr benötigt.')
@@ -389,6 +435,7 @@ async def pc(ctx, name):
     if isinstance(ctx.message.channel, discord.DMChannel):
         await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
     else:
+	
         if '*' in name:
             message = await ctx.send('Der Name darf keine Sonderzeichen enthalten.')
             message_id = message.id
@@ -397,6 +444,7 @@ async def pc(ctx, name):
             msg1 = await ctx.message.channel.fetch_message(ctx.message.id)
             await msg.delete()
             await msg1.delete()
+	
         else:
             if name.islower():
                 if str(discord.utils.get(ctx.message.author.guild.roles, name=name)) == 'None':
@@ -415,8 +463,10 @@ async def pc(ctx, name):
                     await channel.set_permissions(get(guild.roles, name=name1), attach_files=True, embed_links=True, send_messages=True, read_messages=True)
                     await channel.set_permissions(get(guild.roles, name=name1admin), manage_messages=True)
                     await channel.send('Willkommen in deinem privaten Textkanal.\nMit `` '+prefix+'pc_add [UserID] `` kannst du deine Freunde hinzufügen. Falls du die ID nicht weißt, benutze gerne ``'+prefix+'getID [@MENTION]`` Bitte beachte, dass Admins auch Nachrichten aus einem privaten Kanal lesen können!\nWenn der Kanal nicht mehr benötigt wird, schreibe bitte einen unserer Moderatoren (@Mod/TEAM) an.')
-                else:
+                
+		else:
                     await ctx.send('Dieser Name ist leider bereits Vergeben.')
+		
             else:
                 message = await ctx.send('Der Name darf keine Großbuchstaben enthalten.')
                 message_id = message.id
@@ -430,6 +480,7 @@ async def pc(ctx, name):
 async def pc_add(ctx, p: discord.Member):
     if isinstance(ctx.message.channel, discord.DMChannel):
         await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
+	
     else:
         name = ctx.message.channel.name
         guild=ctx.message.guild
@@ -441,8 +492,10 @@ async def pc_add(ctx, p: discord.Member):
 @client.command(aliases=['roll','dice'])
 async def wuerfeln(ctx, arg=6):
     await ctx.channel.purge(limit=1)
+
     if isinstance(ctx.message.channel, discord.DMChannel):
         await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
+	
     else:
         dice = random.randint(1, arg)
         embed = discord.Embed(title='Du hast eine ``'+str(dice)+'`` gewürfelt.', colour=discord.Colour.blue())
@@ -458,8 +511,10 @@ async def wuerfeln(ctx, arg=6):
         dicenums.append(arg)
         refresh()
         await msg.add_reaction('🎲')
+	
         try:
             await msg.add_reaction(':schliessen:732960097344684113')
+	
         except:
             await msg.add_reaction('❎')
 
@@ -469,21 +524,16 @@ async def spam(ctx, arg, arg1='', arg2='', arg3='', arg4=''):
     await ctx.channel.purge(limit=1)
     sleep(10)
     message = arg+''+arg1+''+arg2+''+arg3+''+arg4
-    await ctx.send(message)
-    await ctx.send(message)
-    await ctx.send(message)
-    await ctx.send(message)
-    await ctx.send(message)
-    await ctx.send(message)
-    await ctx.send(message)
-    await ctx.send(message)
-    await ctx.send(message)
-    await ctx.send(message)
+    for x in range(10):
+	await ctx.send(message)
+
 
 @client.command()
 async def fish(ctx):
+	
     if isinstance(ctx.message.channel, discord.DMChannel):
         await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
+	
     else:
         embed = discord.Embed(title='´Blub.´ :tropical_fish:', colour=discord.Colour.dark_blue())
         await ctx.channel.purge(limit=1)
@@ -492,8 +542,10 @@ async def fish(ctx):
 @client.command(aliases=['zufall','zufallsgenerator'])
 async def entscheidung(ctx, *, arg):
     await ctx.channel.purge(limit=1)
+
     if isinstance(ctx.message.channel, discord.DMChannel):
         await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
+	
     else:
         arg = arg.split(' ')
         zufall = random.randint(0, len(arg)-1)
@@ -504,15 +556,19 @@ async def entscheidung(ctx, *, arg):
 @client.command(aliases=['id','getid','gid'])
 async def getID(ctx, arg=' '):
     await ctx.channel.purge(limit=1)
+
     if isinstance(ctx.message.channel, discord.DMChannel):
         await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
+	
     else:
         if arg == ' ':
             id = ctx.author.id
             embed = discord.Embed(title='Deine ID ist: ``'+str(id)+'``.', colour=discord.Colour.purple())
+		
         if arg == 'channel':
             id = ctx.channel.id
             embed = discord.Embed(title='Die ID des Channels ist ``'+str(id)+'``.', colour=discord.Colour.purple())
+		
         if arg.startswith('<@'):
             arg = arg.replace('<', '')
             arg = arg.replace('>', '')
@@ -521,6 +577,7 @@ async def getID(ctx, arg=' '):
             arg = arg.replace('&', '')
             id = arg
             embed = discord.Embed(title='Die ID des ausgewählten Members ist ``'+str(id)+ '``.', colour=discord.Colour.purple())
+	
         if arg.startswith('<#'):
             arg = arg.replace('<', '')
             arg = arg.replace('#', '')
@@ -528,6 +585,7 @@ async def getID(ctx, arg=' '):
             arg = arg.replace('>', '')
             id = arg
             embed = discord.Embed(title='Die ID des ausgewählten Channels ist ``'+str(id)+'``.', colour=discord.Colour.purple())
+		
         embed.set_author(name=ctx.message.author, icon_url=ctx.author.avatar_url)
         await ctx.send(content=None, embed=embed)
 
@@ -536,6 +594,7 @@ async def ping(ctx):
     await ctx.channel.purge(limit=1)
     if isinstance(ctx.message.channel, discord.DMChannel):
         await ctx.send('Dieser Bot ist nicht in einem Privatchat verfügbar.')
+	
     else:
         ping = round(client.latency*1000)
         embed = discord.Embed(title='Der aktuelle Ping beträgt ``'+str(ping)+'``ms.')
@@ -560,12 +619,14 @@ async def embed(ctx, *, msg):
 @client.command()
 async def google(ctx, *, msg):
     test = True
+
     while test == True:
         message = message.replace(' ', '+')
         if ' ' in message.lower():
             test = True
         else:
             test = False
+	
     link = 'https://www.google.com/search?&q='+message
     embed = discord.Embed(title='Google-Suche: '+msg, description=link)
     await ctx.send(content=None, embed=embed)
