@@ -116,7 +116,7 @@ def refresh():
     datatowrite = str(weiterleitung_id) + '\n' + str(weiterleitung_author_id) + '\n' + str(helpids) + '\n' + str(helppages) + '\n' + str(clids) + '\n' + str(clpages) + '\n' + str(diceids) + '\n' + str(dicenums) + '\n' + str(diceauthor)
     file = open('MisteriBotVars.txt', 'w+')
     file.write(datatowrite)
-    file.close()		
+    file.close()
 
 @client.event
 async def on_ready():
@@ -571,4 +571,4 @@ async def google(ctx, *, msg):
     await ctx.send(content=None, embed=embed)
 
 
-client.run('#TODO: insert token')
+client.run('')
