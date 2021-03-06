@@ -15,8 +15,7 @@ from itertools import cycle
 #2 settings
 
 #2.1 Activate member objects from API
-intents = discord.Intents.defauls()
-intents.members = True
+intents = discord.Intents.all()
 
 #2.2 Set Bot´s custom status
 status = cycle([str(len(client.guilds))+" guilds", "bit.ly/misteribot"])
@@ -102,7 +101,7 @@ file.close()
 
 
 #7 create bot instance
-client = commands.Bot(command_prefix = "%")
+client = commands.Bot(command_prefix = "%", intents = intents)
 client.remove_command('help')
 
 
@@ -130,7 +129,7 @@ def refresh():
     datatowrite = str(weiterleitung_id) + '\n' + str(weiterleitung_author_id) + '\n' + str(helpids) + '\n' + str(helppages) + '\n' + str(clids) + '\n' + str(clpages) + '\n' + str(diceids) + '\n' + str(dicenums) + '\n' + str(diceauthor) + '\n' + str(setlanguage_id)
     file = open('MisteriBotVars.txt', 'w+')
     file.write(datatowrite)
-    file.close()		
+    file.close()
 
 
 
@@ -180,7 +179,7 @@ async def on_message(message):
         embed = discord.Embed(title="Das Prefix dieses Servers ist ``"+prefix+"``.", colour=discord.Colour.blue())
         await message.channel.send(content=None, embed=embed)
     await client.process_commands(message)
-    
+
 #9.2 on_ready: start methods
 @client.event
 async def on_ready():
@@ -447,7 +446,7 @@ async def changelog(ctx):
 @client.command()
 @commands.has_permissions(manage_messages=True)
 async def globalchangelog(ctx):
-    await ctx.channelk.purge(limit=1)
+    await ctx.channel.purge(limit=1)
     global clembed4
     await ctx.send(content=None, embed=clembed4)
 
@@ -617,7 +616,7 @@ async def pc(ctx, name):
                 msg1 = await ctx.message.channel.fetch_message(ctx.message.id)
                 await msg.delete()
                 await msg1.delete()
-                
+
 #10.4.2 Private Chat Delete
 @client.command(pass_context=True)
 @commands.has_permissions(manage_roles=True)
@@ -629,7 +628,7 @@ async def pc_delete(ctx, name):
         await discord.CategoryChannel.delete(get(guild.channels, name=name), reason='Der Kanal (Ein Privatchat) wurde durch den Nutzer gelöscht, offensichtlich wurde er nicht mehr benötigt.')
         await discord.Role.delete(get(guild.roles, name=name),reason='Die Rolle zu einem Privatchat wurde durch den Nutzer gelöscht, offensichtlich wurde sie nicht mehr benötigt.')
         await discord.Role.delete(get(guild.roles, name='{}-admin'.format(name)),reason='Die Rolle zu einem Privatchat wurde durch den Nutzer gelöscht, offensichtlich wurde sie nicht mehr benötigt.')
-        
+
 #10.4.3 Private Chat Person Add
 @client.command()
 async def pc_add(ctx, p: discord.Member):
@@ -663,7 +662,7 @@ async def wiederruf(ctx):
     except:
         error = discord.Embed(title='Fehler 001', colour=discord.Colour.red(), description='Ich konnte kein Feedback von dir finden.')
         await ctx.send(content=None, embed=error)
-        
+
 #10.6 Easter Eggs
 
 #10.6.1 fish
