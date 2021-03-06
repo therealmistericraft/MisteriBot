@@ -34,6 +34,7 @@ from discord.ext import commands
 from discord.ext import tasks
 from discord.utils import get
 import json
+import os
 
 
 
@@ -70,3 +71,55 @@ with open("../data/lang/german.json") as gerfile:
 #4.3.2 english
 with open("../data/lang/english.json") as engfile:
     msg_eng = json.load(engfile)
+
+
+
+#5 create bot instance
+client = commands.Bot(command_prefix = "§", intents = intents)
+client.remove_command('help')
+
+
+
+#6 Load specific cogs
+@client.command()
+async def load(ctx, extension):
+    if await is_owner(ctx.message.author):
+        if extension+".py" in os.listdir("./events"):
+            client.load_extension(f"events.{extension}")
+            await ctx.send(content=None, embed=discord.Embed(title="Event was loaded.", description=None, colour=discord.Colour.orange()))
+
+
+
+#7 unload specific cogs
+@client.command()
+async def unload(ctx, extension):
+    if ctx.message.author.id == 303166734557380608:
+        if extension+".py" in os.listdir("./events"):
+            client.unload_extension(f"events.{extension}")
+            await ctx.send(content=None, embed=discord.Embed(title="Event was unloaded.", description=None, colour=discord.Colour.orange()))
+
+
+
+#8 reload specific cogs
+@client.command()
+async def reload(ctx, extension):
+    if ctx.message.author.id == 303166734557380608:
+        if extension+".py" in os.listdir("./events"):
+            await ctx.send(content=None, embed=discord.Embed(title="Event was reloaded.", description=None, colour=discord.Colour.orange()))
+            client.unload_extension(f"events.{extension}")
+            client.load_extension(f"events.{extension}")
+
+
+
+#9 Activating/loading all cogs on startup
+for filename in os.listdir("./events"):
+    if filename.endswith(".py"):
+        client.load_extension(f"events.{filename[:-3]}")
+
+
+
+
+#10 Token
+with open("token.txt", "r") as tokenfile:
+    token = tokenfile.read()
+client.run(token)
