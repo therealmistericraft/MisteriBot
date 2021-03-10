@@ -82,32 +82,32 @@ client.remove_command('help')
 
 #6 Load specific cogs
 @client.command()
+@commands.is_owner()
 async def load(ctx, extension):
-    if await is_owner(ctx.message.author):
-        if extension+".py" in os.listdir("./events"):
-            client.load_extension(f"events.{extension}")
-            await ctx.send(content=None, embed=discord.Embed(title="Event was loaded.", description=None, colour=discord.Colour.orange()))
+    if extension+".py" in os.listdir("./events"):
+        client.load_extension(f"events.{extension}")
+        await ctx.send(content=None, embed=discord.Embed(title="Event was loaded.", description=None, colour=discord.Colour.orange()))
 
 
 
 #7 unload specific cogs
 @client.command()
+@commands.is_owner()
 async def unload(ctx, extension):
-    if ctx.message.author.id == 303166734557380608:
-        if extension+".py" in os.listdir("./events"):
-            client.unload_extension(f"events.{extension}")
-            await ctx.send(content=None, embed=discord.Embed(title="Event was unloaded.", description=None, colour=discord.Colour.orange()))
+    if extension+".py" in os.listdir("./events"):
+        client.unload_extension(f"events.{extension}")
+        await ctx.send(content=None, embed=discord.Embed(title="Event was unloaded.", description=None, colour=discord.Colour.orange()))
 
 
 
 #8 reload specific cogs
 @client.command()
+@commands.is_owner()
 async def reload(ctx, extension):
-    if ctx.message.author.id == 303166734557380608:
-        if extension+".py" in os.listdir("./events"):
-            await ctx.send(content=None, embed=discord.Embed(title="Event was reloaded.", description=None, colour=discord.Colour.orange()))
-            client.unload_extension(f"events.{extension}")
-            client.load_extension(f"events.{extension}")
+    if extension+".py" in os.listdir("./events"):
+        await ctx.send(content=None, embed=discord.Embed(title="Event was reloaded.", description=None, colour=discord.Colour.orange()))
+        client.unload_extension(f"events.{extension}")
+        client.load_extension(f"events.{extension}")
 
 
 
