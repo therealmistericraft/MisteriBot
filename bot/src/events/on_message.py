@@ -4,8 +4,12 @@ import discord
 from discord.ext import commands
 import json
 import sys
-sys.path.append("../")
-import MisteriBot as main
+#sys.path.append("../")
+from MisteriBot import langs
+from MisteriBot import msg_ger
+from MisteriBot import msg_eng
+from MisteriBot import prefix
+from MisteriBot import custom_prefixes
 
 
 
@@ -19,23 +23,24 @@ class On_message(commands.Cog):
         #check for language
         if message.guild:
             if not message.content == '*setlanguage':
-                if main.langs[str(message.guild.id)]:
-                    if main.langs[str(message.guild.id)] == "german":
-                        main.lang = main.msg_ger
-                    if main.langs[str(message.guild.id)] == "english":
-                        main.lang = main.msg_eng
-                elif message.content.startswith == main.prefix:
+                print(langs)
+                if langs[str(message.guild.id)]:
+                    if langs[str(message.guild.id)] == "german":
+                        lang = msg_ger
+                    if langs[str(message.guild.id)] == "english":
+                        lang = msg_eng
+                elif message.content.startswith == prefix:
                     await message.channel.send(content=None, embed=discord.Embed(title='Error 001', description='There is no language set up for this guild/server. Please contact the owner of the server, which can set up the language with `*setlanguage`.', colour=discord.Colour.red()))
             #check for prefix
-            if main.custom_prefixes[str(message.guild.id)]:
-                main.prefix = main.custom_prefixes[str(message.guild.id)]
+            if custom_prefixes[str(message.guild.id)]:
+                prefix = custom_prefixes[str(message.guild.id)]
             else:
-                main.prefix = main.default_prefix
+                prefix = default_prefix
         #error if DMChannel
         else:
             await message.channel.send(content=None, embed=discord.Embed(title='Error 002', description='This Bot is not available in direct chats or an unexpected error occured. Please try again on a guild/server.\nTo send my developer a message, write a DM to `MisteriCraft#5019`', colour=discord.Colour.red()))
         #set determined prefix
-        main.client.command_prefix = main.prefix
+        client.command_prefix = prefix
 
 
         #answers
