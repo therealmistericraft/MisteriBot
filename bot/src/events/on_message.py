@@ -4,12 +4,14 @@ import discord
 from discord.ext import commands
 import json
 import sys
+import random
 #sys.path.append("../")
 from MisteriBot import langs
 from MisteriBot import msg_ger
 from MisteriBot import msg_eng
 from MisteriBot import prefix
 from MisteriBot import custom_prefixes
+from MisteriBot import default_prefix
 
 
 
@@ -22,25 +24,26 @@ class On_message(commands.Cog):
     async def on_message(self, message):
         #check for language
         if message.guild:
-            if not message.content == '*setlanguage':
-                print(langs)
-                if langs[str(message.guild.id)]:
-                    if langs[str(message.guild.id)] == "german":
-                        lang = msg_ger
-                    if langs[str(message.guild.id)] == "english":
-                        lang = msg_eng
-                elif message.content.startswith == prefix:
-                    await message.channel.send(content=None, embed=discord.Embed(title='Error 001', description='There is no language set up for this guild/server. Please contact the owner of the server, which can set up the language with `*setlanguage`.', colour=discord.Colour.red()))
             #check for prefix
-            if custom_prefixes[str(message.guild.id)]:
+            if str(message.guild.id) in custom_prefixes:
                 prefix = custom_prefixes[str(message.guild.id)]
             else:
                 prefix = default_prefix
+            if message.content != '*setlanguage':
+                if str(message.guild.id) in langs:
+                    if langs[str(message.guild.id)] == 'german':
+                        lang = msg_ger
+                    elif langs[str(message.guild.id)] == 'english':
+                        lang = msg_eng
+                    else:
+                        message.channel.send(content=None, embed=discord.Embed(title='Error 001', description='That is my fault - I forgot which language you speak! Please contact the owner of the server, which can set up the language again with `*setlanguage`.', colour=discord.Colour.red()))
+                elif message.content.startswith(prefix):
+                    await message.channel.send(content=None, embed=discord.Embed(title='Error 001', description='There is no language set up for this guild/server. Please contact the owner of the server, which can set up the language with `*setlanguage`.', colour=discord.Colour.red()))
         #error if DMChannel
         else:
             await message.channel.send(content=None, embed=discord.Embed(title='Error 002', description='This Bot is not available in direct chats or an unexpected error occured. Please try again on a guild/server.\nTo send my developer a message, write a DM to `MisteriCraft#5019`', colour=discord.Colour.red()))
         #set determined prefix
-        client.command_prefix = prefix
+        self.client.command_prefix = prefix
 
 
         #answers
