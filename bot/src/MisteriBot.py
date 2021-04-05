@@ -35,17 +35,12 @@ from discord.ext import tasks
 from discord.utils import get
 import json
 import os
-from itertools import cycle
 
 
 
 #2 settings
 #2.1 Activate Intents from API
 intents = discord.Intents.all()
-#2.2 Set custom status
-status = cycle(['go.mistericraft.ga/misteribot', str(len(client.guilds))+' guilds'])
-#TODO: complete
-#Add "ping me to get the prefix"
 
 
 
@@ -111,7 +106,7 @@ def setLangs(pLangs):
 
 
 
-#6 create bot instance
+#6.1 create bot instance
 client = commands.Bot(command_prefix = "§", intents = intents)
 client.remove_command('help')
 

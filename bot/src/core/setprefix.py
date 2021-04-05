@@ -16,13 +16,17 @@ class Setprefix(commands.Cog):
 
     @commands.command(aliases = ['changeprefix', 'cp', 'prefix'])
     async def setprefix(self, ctx, pPrefix):
-        with await ctx.channel.typing():
-            tempCustomPrefixes = getCustomPrefixes()
-            tempCustomPrefixes[str(ctx.guild.id)] = pPrefix
-            setCustomPrefixes(tempCustomPrefixes)
-            with open("../data/usr/prefix.json", "w") as prefixfile:
-                json.dump(getCustomPrefixes(), prefixfile, indent=4)
-            await ctx.send(getLang()["setprefix1"]+tempCustomPrefixes[str(ctx.guild.id)]+"`")
+        async with ctx.channel.typing():
+            if pPrefix != '' and len(pPrefix) < 5:
+                tempCustomPrefixes = getCustomPrefixes()
+                tempCustomPrefixes[str(ctx.guild.id)] = pPrefix
+                setCustomPrefixes(tempCustomPrefixes)
+                with open("../data/usr/prefix.json", "w") as prefixfile:
+                    json.dump(getCustomPrefixes(), prefixfile, indent=4)
+                embed = discord.Embed(title='Success', description=getLang()["setprefix1"]+tempCustomPrefixes[str(ctx.guild.id)]+"`", color=discord.Color.blue())
+            else:
+                embed = discord.Embed(title='Error 002', description=getLang()["setprefix2"], color=discord.Color.red())
+            await ctx.send(content=None, embed=embed)
 
 
 
