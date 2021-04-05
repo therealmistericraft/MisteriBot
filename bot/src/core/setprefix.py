@@ -16,12 +16,13 @@ class Setprefix(commands.Cog):
 
     @commands.command(aliases = ['changeprefix', 'cp', 'prefix'])
     async def setprefix(self, ctx, pPrefix):
-        tempCustomPrefixes = getCustomPrefixes()
-        tempCustomPrefixes[str(ctx.guild.id)] = pPrefix
-        setCustomPrefixes(tempCustomPrefixes)
-        with open("../data/usr/prefix.json", "w") as prefixfile:
-            json.dump(getCustomPrefixes(), prefixfile, indent=4)
-        await ctx.send(getLang()["setprefix1"]+tempCustomPrefixes[str(ctx.guild.id)]+"`")
+        with await ctx.channel.typing():
+            tempCustomPrefixes = getCustomPrefixes()
+            tempCustomPrefixes[str(ctx.guild.id)] = pPrefix
+            setCustomPrefixes(tempCustomPrefixes)
+            with open("../data/usr/prefix.json", "w") as prefixfile:
+                json.dump(getCustomPrefixes(), prefixfile, indent=4)
+            await ctx.send(getLang()["setprefix1"]+tempCustomPrefixes[str(ctx.guild.id)]+"`")
 
 
 

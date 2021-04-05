@@ -53,8 +53,8 @@ class On_message(commands.Cog):
 
             #answers
             #prefix inquiry
-            if message.content == "prefix":
-                embed = discord.Embed(title="The prefix of this server is ``"+prefix+"``.", colour=discord.Colour.blue())
+            if message.content == "prefix" or message.content == f'<@!{self.client.user.id}>':
+                embed = discord.Embed(title="The prefix of this server is ``"+getPrefix()+"``.", colour=discord.Colour.blue())
                 await message.channel.send(content=None, embed=embed)
 
             #hello
