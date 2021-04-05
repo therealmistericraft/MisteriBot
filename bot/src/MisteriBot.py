@@ -92,12 +92,16 @@ def getMsgEng():
     return msg_eng
 #5.2 set-Methods
 def setPrefix(pPrefix):
+    global prefix
     prefix = pPrefix
 def setLang(pLang):
+    global lang
     lang = pLang
 def setCustomPrefixes(pCustomPrefixes):
+    global custom_prefixes
     custom_prefixes = pCustomPrefixes
 def setLangs(pLangs):
+    global langs
     langs = pLangs
 
 
