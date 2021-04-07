@@ -15,10 +15,11 @@ class Help(commands.Cog):
     async def help(self, ctx):
         page_url = 'https://raw.githubusercontent.com/wiki/therealmistericraft/MisteriBot/Commands.md'
         page = requests.get(page_url)
-        page = page.json()
-        print(page)
-        #page = page.split('| --- | --- |')
-        #print(page[1])
+        page = page.text
+        page = page.split('| --- | --- |')
+        fields = page.split('|')
+        #TODO: Bound 2 single fields to one cmd, remove withespaces
+        print(page[1])
 
 
 

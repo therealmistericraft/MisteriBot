@@ -58,7 +58,8 @@ class On_message(commands.Cog):
                 await message.channel.send(content=None, embed=embed)
 
             #hello
-            if any(word in message.content.lower() for word in ["hallo", "hello", "hi", "moin", "hey", "tach", "morning", "servus"]):
+            greetings = ["hallo", "hello", "hi", "moin", "hey", "tach", "morning", "servus"]
+            if message.content.lower() in greetings:
                 hello = ["https://tenor.com/view/hello-there-private-from-penguins-of-madagascar-hi-wave-hey-there-gif-16043627", "https://tenor.com/view/baby-yoda-baby-yoda-wave-baby-yoda-waving-hi-hello-gif-15975082", "https://tenor.com/view/inside-out-joy-hi-hey-hello-gif-4763730", "https://tenor.com/view/hello-funny-wave-chicken-gif-13330039", "https://tenor.com/view/hi-husky-hello-cute-gif-15361405"]
                 id = random.randint(0, len(hello)-1)
                 await message.channel.send(hello[id])

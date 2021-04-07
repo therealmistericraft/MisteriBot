@@ -33,14 +33,18 @@ import discord
 from discord.ext import commands
 from discord.ext import tasks
 from discord.utils import get
+from itertools import cycle
 import json
 import os
+import logging
 
 
 
 #2 settings
 #2.1 Activate Intents from API
 intents = discord.Intents.all()
+#2.2 Costumize logging behavior
+logging.basicConfig(format='%(asctime)s: %(levelname)s: %(message)s', datefmt='%Y-%m-%d; %H:%M:%S', level=logging.INFO)
 
 
 
@@ -80,6 +84,8 @@ def getPrefix():
     return prefix
 def getLang():
     return lang
+def getMsg(message):
+    return lang[message]
 def getCustomPrefixes():
     return custom_prefixes
 def getDefaultPrefix():
@@ -109,6 +115,13 @@ def setLangs(pLangs):
 #6.1 create bot instance
 client = commands.Bot(command_prefix = "§", intents = intents)
 client.remove_command('help')
+#6.2 Set custom status
+status = cycle(['go.mistericraft.ga/misteribot', str(len(client.guilds))+' guilds', 'pings to get the prefix'])
+#6.3 start status loop
+@tasks.loop(seconds=20)
+async def change_status():
+    #Start custom status cyclus
+    await client.change_presence(status=discord.Status.online,activity=discord.Activity(type=discord.ActivityType.listening, name=next(status)))
 
 
 
@@ -118,10 +131,15 @@ client.remove_command('help')
 async def load(ctx, extension):
     if extension+".py" in os.listdir("./events"):
         client.load_extension(f"events.{extension}")
-        await ctx.send(content=None, embed=discord.Embed(title="Event was loaded.", description=None, colour=discord.Colour.orange()))
-    if extension+".py" in os.listdir("./core"):
+        await ctx.send(content=None, embed=discord.Embed(title="Event was loaded.", description=extension, colour=discord.Colour.orange()))
+        logging.info('Event "'+extension+'" loaded')
+    elif extension+".py" in os.listdir("./core"):
         client.load_extension(f"core.{extension}")
-        await ctx.send(content=None, embed=discord.Embed(title="Command was loaded.", description=None, colour=discord.Colour.orange()))
+        await ctx.send(content=None, embed=discord.Embed(title="Command was loaded.", description=extension, colour=discord.Colour.orange()))
+        logging.info('Core command "'+extension+'" loaded')
+    else:
+        logging.warning('Extension "'+extension+'" not found')
+        await ctx.send(content=None, embed=discord.Embed(title='Error', description='Extension `'+extension+'` not found', colour=discord.Colour.red()))
 
 
 
@@ -131,10 +149,15 @@ async def load(ctx, extension):
 async def unload(ctx, extension):
     if extension+".py" in os.listdir("./events"):
         client.unload_extension(f"events.{extension}")
-        await ctx.send(content=None, embed=discord.Embed(title="Event was unloaded.", description=None, colour=discord.Colour.orange()))
-    if extension+".py" in os.listdir("./core"):
+        await ctx.send(content=None, embed=discord.Embed(title="Event was unloaded.", description=extension, colour=discord.Colour.orange()))
+        logging.info('Event "'+extension+'" unloaded')
+    elif extension+".py" in os.listdir("./core"):
         client.unload_extension(f"core.{extension}")
-        await ctx.send(content=None, embed=discord.Embed(title="Command was unloaded.", description=None, colour=discord.Colour.orange()))
+        await ctx.send(content=None, embed=discord.Embed(title="Command was unloaded.", description=extension, colour=discord.Colour.orange()))
+        logging.info('Core command "'+extension+'" unloaded')
+    else:
+        logging.warning('Extension "'+extension+'" not found')
+        await ctx.send(content=None, embed=discord.Embed(title='Error', description='Extension `'+extension+'` not found', colour=discord.Colour.red()))
 
 
 
@@ -143,13 +166,18 @@ async def unload(ctx, extension):
 @commands.is_owner()
 async def reload(ctx, extension):
     if extension+".py" in os.listdir("./events"):
-        await ctx.send(content=None, embed=discord.Embed(title="Event was reloaded.", description=None, colour=discord.Colour.orange()))
         client.unload_extension(f"events.{extension}")
         client.load_extension(f"events.{extension}")
-    if extension+".py" in os.listdir("./core"):
-        await ctx.send(content=None, embed=discord.Embed(title="Command was reloaded.", description=None, colour=discord.Colour.orange()))
+        await ctx.send(content=None, embed=discord.Embed(title="Event was reloaded.", description=extension, colour=discord.Colour.orange()))
+        logging.info('Event "'+extension+'" reloaded')
+    elif extension+".py" in os.listdir("./core"):
         client.unload_extension(f"core.{extension}")
         client.load_extension(f"core.{extension}")
+        await ctx.send(content=None, embed=discord.Embed(title="Command was reloaded.", description=extension, colour=discord.Colour.orange()))
+        logging.info('Core command "'+extension+'" reloaded')
+    else:
+        logging.warning('Extension "'+extension+'" not found')
+        await ctx.send(content=None, embed=discord.Embed(title='Error', description='Extension `'+extension+'` not found', colour=discord.Colour.red()))
 
 
 
@@ -157,9 +185,11 @@ async def reload(ctx, extension):
 for filename in os.listdir("./events"):
     if filename.endswith(".py"):
         client.load_extension(f"events.{filename[:-3]}")
+        logging.info('All events loaded')
 for filename in os.listdir("./core"):
     if filename.endswith(".py"):
         client.load_extension(f"core.{filename[:-3]}")
+        logging.info('All core commands loaded')
 
 
 

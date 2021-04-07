@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 import json
 from MisteriBot import setCustomPrefixes
-from MisteriBot import getLang
+from MisteriBot import getMsg
 from MisteriBot import getCustomPrefixes
 
 
@@ -23,9 +23,9 @@ class Setprefix(commands.Cog):
                 setCustomPrefixes(tempCustomPrefixes)
                 with open("../data/usr/prefix.json", "w") as prefixfile:
                     json.dump(getCustomPrefixes(), prefixfile, indent=4)
-                embed = discord.Embed(title='Success', description=getLang()["setprefix1"]+tempCustomPrefixes[str(ctx.guild.id)]+"`", color=discord.Color.blue())
+                embed = discord.Embed(title='Success', description=getMsg("setprefix1")+tempCustomPrefixes[str(ctx.guild.id)]+"`", color=discord.Color.blue())
             else:
-                embed = discord.Embed(title='Error 002', description=getLang()["setprefix2"], color=discord.Color.red())
+                embed = discord.Embed(title='Error 002', description=getMsg("setprefix2"), color=discord.Color.red())
             await ctx.send(content=None, embed=embed)
 
 
