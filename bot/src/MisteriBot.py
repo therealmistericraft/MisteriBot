@@ -60,20 +60,20 @@ msg_eng = {}
 
 #4 initalizing
 #4.1 prefix
-with open("../data/usr/prefix.json") as prefixfile:
+with open("bot/data/usr/prefix.json") as prefixfile:
     custom_prefixes = json.load(prefixfile)
 default_prefix = '*'
 
 #4.2 language
-with open("../data/usr/lang.json") as langfile:
+with open("bot/data/usr/lang.json") as langfile:
     langs = json.load(langfile)
 
 #4.3 multi-language messages
 #4.3.1 german
-with open("../data/lang/german.json") as gerfile:
+with open("bot/data/lang/german.json") as gerfile:
     msg_ger = json.load(gerfile)
 #4.3.2 english
-with open("../data/lang/english.json") as engfile:
+with open("bot/data/lang/english.json") as engfile:
     msg_eng = json.load(engfile)
 
 
@@ -129,11 +129,11 @@ async def change_status():
 @client.command()
 @commands.is_owner()
 async def load(ctx, extension):
-    if extension+".py" in os.listdir("./events"):
+    if extension+".py" in os.listdir("bot/src/events"):
         client.load_extension(f"events.{extension}")
         await ctx.send(content=None, embed=discord.Embed(title="Event was loaded.", description=extension, colour=discord.Colour.orange()))
         logging.info('Event "'+extension+'" loaded')
-    elif extension+".py" in os.listdir("./core"):
+    elif extension+".py" in os.listdir("bot/src/core"):
         client.load_extension(f"core.{extension}")
         await ctx.send(content=None, embed=discord.Embed(title="Command was loaded.", description=extension, colour=discord.Colour.orange()))
         logging.info('Core command "'+extension+'" loaded')
@@ -147,11 +147,11 @@ async def load(ctx, extension):
 @client.command()
 @commands.is_owner()
 async def unload(ctx, extension):
-    if extension+".py" in os.listdir("./events"):
+    if extension+".py" in os.listdir("bot/src/events"):
         client.unload_extension(f"events.{extension}")
         await ctx.send(content=None, embed=discord.Embed(title="Event was unloaded.", description=extension, colour=discord.Colour.orange()))
         logging.info('Event "'+extension+'" unloaded')
-    elif extension+".py" in os.listdir("./core"):
+    elif extension+".py" in os.listdir("bot/src/core"):
         client.unload_extension(f"core.{extension}")
         await ctx.send(content=None, embed=discord.Embed(title="Command was unloaded.", description=extension, colour=discord.Colour.orange()))
         logging.info('Core command "'+extension+'" unloaded')
@@ -165,12 +165,12 @@ async def unload(ctx, extension):
 @client.command()
 @commands.is_owner()
 async def reload(ctx, extension):
-    if extension+".py" in os.listdir("./events"):
+    if extension+".py" in os.listdir("bot/src/events"):
         client.unload_extension(f"events.{extension}")
         client.load_extension(f"events.{extension}")
         await ctx.send(content=None, embed=discord.Embed(title="Event was reloaded.", description=extension, colour=discord.Colour.orange()))
         logging.info('Event "'+extension+'" reloaded')
-    elif extension+".py" in os.listdir("./core"):
+    elif extension+".py" in os.listdir("bot/src/core"):
         client.unload_extension(f"core.{extension}")
         client.load_extension(f"core.{extension}")
         await ctx.send(content=None, embed=discord.Embed(title="Command was reloaded.", description=extension, colour=discord.Colour.orange()))
@@ -182,11 +182,11 @@ async def reload(ctx, extension):
 
 
 #10 Activating/loading all cogs on startup
-for filename in os.listdir("./events"):
+for filename in os.listdir("bot/src/events"):
     if filename.endswith(".py"):
         client.load_extension(f"events.{filename[:-3]}")
         logging.info('All events loaded')
-for filename in os.listdir("./core"):
+for filename in os.listdir("bot/src/core"):
     if filename.endswith(".py"):
         client.load_extension(f"core.{filename[:-3]}")
         logging.info('All core commands loaded')

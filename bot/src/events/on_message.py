@@ -4,18 +4,7 @@ import discord
 from discord.ext import commands
 import json
 import random
-from MisteriBot import getLang
-from MisteriBot import getLangs
-from MisteriBot import getMsgGer
-from MisteriBot import getMsgEng
-from MisteriBot import getPrefix
-from MisteriBot import getCustomPrefixes
-from MisteriBot import getDefaultPrefix
-from MisteriBot import setLang
-from MisteriBot import setLangs
-from MisteriBot import setPrefix
-from MisteriBot import setCustomPrefixes
-
+from MisteriBot import getLang, getLangs, getMsgGer, getMsgEng, getPrefix, getCustomPrefixes, getDefaultPrefix, setLang, setLangs, setPrefix, setCustomPrefixes
 
 
 class On_message(commands.Cog):
@@ -60,7 +49,13 @@ class On_message(commands.Cog):
             #hello
             greetings = ["hallo", "hello", "hi", "moin", "hey", "tach", "morning", "servus"]
             if message.content.lower() in greetings:
-                hello = ["https://tenor.com/view/hello-there-private-from-penguins-of-madagascar-hi-wave-hey-there-gif-16043627", "https://tenor.com/view/baby-yoda-baby-yoda-wave-baby-yoda-waving-hi-hello-gif-15975082", "https://tenor.com/view/inside-out-joy-hi-hey-hello-gif-4763730", "https://tenor.com/view/hello-funny-wave-chicken-gif-13330039", "https://tenor.com/view/hi-husky-hello-cute-gif-15361405"]
+                hello = [
+                    "https://tenor.com/view/hello-there-private-from-penguins-of-madagascar-hi-wave-hey-there-gif-16043627",
+                    "https://tenor.com/view/baby-yoda-baby-yoda-wave-baby-yoda-waving-hi-hello-gif-15975082",
+                    "https://tenor.com/view/inside-out-joy-hi-hey-hello-gif-4763730",
+                    "https://tenor.com/view/hello-funny-wave-chicken-gif-13330039",
+                    "https://tenor.com/view/hi-husky-hello-cute-gif-15361405"
+                ]
                 id = random.randint(0, len(hello)-1)
                 await message.channel.send(hello[id])
 
