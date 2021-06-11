@@ -21,7 +21,7 @@ class Setprefix(commands.Cog):
                 tempCustomPrefixes = getCustomPrefixes()
                 tempCustomPrefixes[str(ctx.guild.id)] = pPrefix
                 setCustomPrefixes(tempCustomPrefixes)
-                with open("../data/usr/prefix.json", "w") as prefixfile:
+                with open("bot/data/usr/prefix.json", "w") as prefixfile:
                     json.dump(getCustomPrefixes(), prefixfile, indent=4)
                 embed = discord.Embed(title='Success', description=getMsg("setprefix1")+tempCustomPrefixes[str(ctx.guild.id)]+"`", color=discord.Color.blue())
             else:

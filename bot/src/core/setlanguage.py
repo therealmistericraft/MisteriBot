@@ -3,9 +3,7 @@
 import discord
 from discord.ext import commands
 import json
-from MisteriBot import getLangs
-from MisteriBot import setLangs
-
+from MisteriBot import getLangs, setLangs
 
 
 class Setlanguage(commands.Cog):
@@ -13,7 +11,7 @@ class Setlanguage(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(aliases = ['lang', 'setlang','language', 'sprache'])
+    @commands.command(aliases = ['lang', 'setlang', 'language', 'sprache'])
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
     async def setlanguage(self, ctx, pLanguage):
@@ -22,7 +20,7 @@ class Setlanguage(commands.Cog):
                 tempLangs = getLangs()
                 tempLangs[str(ctx.guild.id)] = pLanguage
                 setLangs(tempLangs)
-                with open("../data/usr/lang.json", "w") as langfile:
+                with open("bot/data/usr/lang.json", "w") as langfile:
                     json.dump(getLangs(), langfile, indent=4)
                 await ctx.send("Language has been set up successfully! Your language: `"+pLanguage+"`")
             else:
